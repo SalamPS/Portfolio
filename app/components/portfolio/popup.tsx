@@ -30,7 +30,7 @@ export default function PopupPortfolio ({popup, setPopup}: {popup:number, setPop
 				<div className="grid grid-cols-2 gap-2 my-2 md:my-3">
 					{item?.imageUrl 
 						&& item.imageUrl.map((img, i) => <>
-							<div key={img+i} 
+							<div key={i} 
 								className={`rounded-md aspect-video bg-cover bg-no-repeat my-2 md:my-3 ${item?.imageUrl && item.imageUrl.length < 2 ? 'col-span-2' : ''}`}	 
 								style={{backgroundImage: `url(/storage/portfolio-ev/${img})`, backgroundPosition: 'center top'}}>
 							</div>
