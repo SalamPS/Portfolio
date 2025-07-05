@@ -3,12 +3,14 @@ export interface blogStructure_ {
 	content: string,
 	authorId: string,
 	authorName: string,
-	createdAt: string,
-	updatedAt: string,
+	createdAt: string | Date,
+	updatedAt: string | Date,
 	comments: commentStructure_[],
+	tags: string[],
+	category: string,
 	likes: number,
 	saves: number,
-	tags: string[],
+	thumbnail: string,
 }
 
 export interface commentStructure_ {
@@ -26,20 +28,24 @@ export interface blogAds_ {
 }
 
 export const blogDummy:blogStructure_ = {
-	title: 'Connecting Husky Clearpath A200 with Jetson AGX Orin',
+	title: 'Why is this post seems empty?',
 	authorId: '1',
 	authorName: 'SalamPS',
 	createdAt: '2023-10-01T12:00:00Z',
 	updatedAt: '2023-10-01T12:00:00Z',
+	tags: ['dummy', 'blog', 'tags'],
+	category: 'Tutorial',
 	comments: [],
 	likes: 0,
 	saves: 0,
-	tags: ['robotics', 'jetson', 'husky'],
+	thumbnail: '/blog/thumbnail-1.png',
 	content: 
 `
 ## Main issues
 This is how you do it.
 > As simple as flipping your head up and down
+
+Fill the whole content with your own words, and make sure to use the right markdown syntax.
 `
 }
 

@@ -15,7 +15,9 @@ const BlogSchema = new mongoose.Schema({
 	}],
 	likes: { type: Number, default: 0 },
 	saves: { type: Number, default: 0 },
-	tags: [{ type: String }],
+	tags: [{ type: String, required: true }],
+	thumbnail: { type: String, default: '' },
+	slug: { type: String, required: true },
 }, {timestamps: true});
 
 export default mongoose.models.lamp_blog || mongoose.model('lamp_blog', BlogSchema);
