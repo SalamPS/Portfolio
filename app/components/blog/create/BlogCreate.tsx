@@ -6,7 +6,7 @@ import { Input } from "../../global/Input"
 import { AutoMD } from "../../utils/Markdown"
 import { blogDummy, blogStructure_ } from '../../interface/blogStructure'
 import { IconUpload, IconX } from '@tabler/icons-react'
-import axios from 'axios'
+import client from '@/app/lib/auth'
 
 const BlogCreate = () => {
 	const [preview, setPreview] = useState(false)	
@@ -64,7 +64,7 @@ const BlogCreate = () => {
 			return;
 		}
 
-		axios.post('/api/v1/blog', blog)
+		client.post('blog', blog)
 			.then((response) => {
 				if (response.data.success) {
 					alert('Blog created successfully!');
