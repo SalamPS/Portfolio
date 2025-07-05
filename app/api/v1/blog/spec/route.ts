@@ -5,23 +5,21 @@ import BlogModel from '@/app/api/models/blogModel';
 import { blogStructure_ } from '@/app/components/interface/blogStructure';
 
 // GET - Mendapatkan blog berdasarkan ID
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(request: NextRequest) {
   try {
     await dbConnect();
     
-    const { id } = await params;
+    const { searchParams } = new URL(request.url);
+    const slug = searchParams.get('slug');
     
-    if (!mongoose.Types.ObjectId.isValid(id)) {
+    if (!slug) {
       return NextResponse.json(
-        { success: false, message: 'Invalid blog ID' },
+        { success: false, message: 'Slug parameter is required' },
         { status: 400 }
       );
     }
     
-    const blog = await BlogModel.findById(id);
+    const blog = await BlogModel.findOne({ slug: slug });
     
     if (!blog) {
       return NextResponse.json(
@@ -32,7 +30,23 @@ export async function GET(
     
     return NextResponse.json({
       success: true,
-      data: blog
+      data: {
+        blog,
+        ads: [
+          {
+            adsId: '1',
+            adsTitle: 'Lamp.Devs',
+            adsImageLink: '/ads/ads-1.png',
+            adsLink: 'https://salamp.id',
+          },
+          {
+            adsId: '2',
+            adsTitle: 'Jetson AGX Orin',
+            adsImageLink: 'https://www.nvidia.com/en-us/autonomous-machines/embedded-systems/jetson-orin/_jcr_content/root/responsivegrid/nv_container_1336425203/nv_image.coreimg.100.850.jpeg/1734419987053/jetson-orin-nano-super-dev-kit-ari.jpeg',
+            adsLink: 'https://developer.nvidia.com/embedded/jetson-agx-orin-devkit',
+          },
+        ]
+      }
     });
     
   } catch (error: unknown) {

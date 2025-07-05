@@ -1,5 +1,6 @@
 import BlogContent from "@/app/components/blog/content/BlogContent";
 import { blogStructure_, blogDummy, blogAds_, adsDummy } from "@/app/components/interface/blogStructure";
+import client from "@/app/lib/auth";
 import { delay } from "@/app/lib/delay";
 
 interface BlogContentWrapperProps {
@@ -11,16 +12,11 @@ const BlogContentWrapper = async ({ content }: BlogContentWrapperProps) => {
 	let blogAds: blogAds_[];
 	
 	try {
-		const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/blog?content=${content}`, {
-			cache: 'no-store'
-		});
+		const response = await client.get(`blog/spec?slug=${content}`);
 		await delay(1000); // Simulate network delay for better UX
-		if (!response.ok) {
-			throw new Error('Failed to fetch blog data');
-		}
-		const result = await response.json();
-		blogData = result.blog;
-		blogAds = result.ads;
+		const { data } = response.data;
+		blogData = data.blog;
+		blogAds = data.ads;
 	} catch (error) {
 		console.log('Error fetching blog data:', error);
 		blogData = blogDummy;
