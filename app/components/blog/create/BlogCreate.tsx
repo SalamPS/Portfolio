@@ -43,7 +43,6 @@ const BlogCreate = () => {
 
 	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		console.log(blog)
 		if (!blog.title) {
 			alert('Title is required');
 			return;

@@ -1,5 +1,5 @@
 import BlogContent from "@/app/components/blog/content/BlogContent";
-import { blogStructure_, blogDummy, blogAds_, adsDummy } from "@/app/components/interface/blogStructure";
+import { blogStructure_, blogAds_, adsDummy, blog404 } from "@/app/components/interface/blogStructure";
 import client from "@/app/lib/auth";
 
 interface BlogContentWrapperProps {
@@ -17,7 +17,7 @@ const BlogContentWrapper = async ({ content }: BlogContentWrapperProps) => {
 		blogAds = data.ads;
 	} catch (error) {
 		console.log('Error fetching blog data:', error);
-		blogData = blogDummy;
+		blogData = blog404;
 		blogAds = adsDummy;
 	}
 

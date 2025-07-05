@@ -125,7 +125,6 @@ export async function POST(request: NextRequest) {
     const uploadDir = join(process.cwd(), 'public', 'blog', 'thumbnails');
     if (!existsSync(uploadDir)) {
       await mkdir(uploadDir, { recursive: true });
-      console.log('Created upload directory:', uploadDir);
     }
     const filePath = join(uploadDir, fileName);
     

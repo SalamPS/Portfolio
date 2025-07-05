@@ -31,10 +31,10 @@ export const blogDummy:blogStructure_ = {
 	title: 'Why is this post seems empty?',
 	authorId: '1',
 	authorName: 'SalamPS',
-	createdAt: '2023-10-01T12:00:00Z',
-	updatedAt: '2023-10-01T12:00:00Z',
+	createdAt: '2025-07-05T12:00:00Z',
+	updatedAt: '2025-07-05T12:00:00Z',
 	tags: ['dummy', 'blog', 'tags'],
-	category: 'Tutorial',
+	category: 'LamP Post',
 	comments: [],
 	likes: 0,
 	saves: 0,
@@ -46,6 +46,32 @@ This is how you do it.
 > As simple as flipping your head up and down
 
 Fill the whole content with your own words, and make sure to use the right markdown syntax.
+`
+}
+
+export const blog404:blogStructure_ = {
+	title: 'Why is this post seems empty?',
+	authorId: '1',
+	authorName: 'SalamPS',
+	createdAt: '2025-07-05T12:00:00Z',
+	updatedAt: '2025-07-05T12:00:00Z',
+	tags: ['404', 'not', 'found'],
+	category: 'LamP Post',
+	comments: [],
+	likes: 0,
+	saves: 0,
+	thumbnail: '/blog/thumbnail-1.png',
+	content: 
+`
+## Chill, it's a common issue
+
+> The solution is simple as flipping your head up and down
+
+1. Search for the right post.
+2. Open the right link.
+3. Or, simply just go back to the homepage.
+
+What are you searching for btw?
 `
 }
 

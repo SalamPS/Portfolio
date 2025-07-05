@@ -6,7 +6,7 @@ const client = axios.create({
     headers: {
         'Content-Type': 'application/json'
     },
-    // withCredentials: true // Make sure this is true to include cookies
+    withCredentials: true // Make sure this is true to include cookies
 });
 
 export default client;
