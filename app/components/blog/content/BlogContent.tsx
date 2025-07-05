@@ -3,6 +3,7 @@ import { blogAds_, blogStructure_, commentStructure_ } from "@/app/components/in
 import { AutoMD } from "../../utils/Markdown";
 import { IconBookmark, IconHeartPlus } from "@tabler/icons-react";
 import Link from "next/link";
+import AdBanner from "./Adsense";
 
 const BlogContent = ({data, ads}: {data: blogStructure_, ads:blogAds_[]}) => {
 	return (
@@ -60,6 +61,13 @@ const BlogContent = ({data, ads}: {data: blogStructure_, ads:blogAds_[]}) => {
 				</main>
 				
 				<section id="ads" className="w-full order-last xl:w-96 flex flex-col gap-4">
+					<div className="w-full aspect-square bg-slate-100 rounded shadow">
+						<AdBanner
+							dataAdSlot="8897271609"
+							dataAdFormat="auto"
+							dataFullWidthResponsive={true}
+						/>
+					</div>
 					{ads && (
 						ads.map((ad, index) => (
 							<Link key={index} href={ad.adsLink} target="_blank" rel="noopener noreferrer" className="bg-slate-500 rounded shadow hover:shadow-lg transition-shadow">

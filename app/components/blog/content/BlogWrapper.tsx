@@ -1,24 +1,31 @@
-import BlogContent from "@/app/components/blog/content/BlogContent";
+'use client';
+
+import { useQuery } from '@tanstack/react-query';
 import { blogStructure_, blogAds_, adsDummy, blog404 } from "@/app/components/interface/blogStructure";
+import BlogSkeleton from '@/app/components/blog/content/BlogSkeleton';
+import BlogContent from "@/app/components/blog/content/BlogContent";
 import client from "@/app/lib/auth";
 
 interface BlogContentWrapperProps {
     content: string;
 }
 
-const BlogContentWrapper = async ({ content }: BlogContentWrapperProps) => {
-	let blogData: blogStructure_;
-	let blogAds: blogAds_[];
-	
-	try {
-		const response = await client.get(`blog/spec?slug=${content}`);
-		const { data } = response.data;
-		blogData = data.blog;
-		blogAds = data.ads;
-	} catch (error) {
-		console.log('Error fetching blog data:', error);
-		blogData = blog404;
-		blogAds = adsDummy;
+const BlogContentWrapper = ({ content }: BlogContentWrapperProps) => {
+	const { data, isLoading, error } = useQuery({
+		queryKey: ['blog', content],
+		queryFn: async () => {
+			const response = await client.get(`blog/spec?slug=${content}`);
+			return response.data.data;
+		},
+		staleTime: 5 * 60 * 1000,
+		cacheTime: 10 * 60 * 1000,
+	});
+
+	const blogData: blogStructure_ = data?.blog || (error ? blog404 : {} as blogStructure_);
+	const blogAds: blogAds_[] = data?.ads || (error ? adsDummy : []);
+
+	if (isLoading) {
+		return <BlogSkeleton/>;
 	}
 
 	return <BlogContent data={blogData} ads={blogAds}/>;
