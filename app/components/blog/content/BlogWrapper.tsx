@@ -13,7 +13,6 @@ const BlogContentWrapper = async ({ content }: BlogContentWrapperProps) => {
 	
 	try {
 		const response = await client.get(`blog/spec?slug=${content}`);
-		await delay(1000); // Simulate network delay for better UX
 		const { data } = response.data;
 		blogData = data.blog;
 		blogAds = data.ads;
