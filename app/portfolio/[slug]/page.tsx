@@ -2,7 +2,7 @@
 import React from 'react';
 import Head from 'next/head';
 import { notFound } from 'next/navigation';
-import { links } from '@/app/components/portfolio/data';
+import { links } from '@/components/portfolio/data';
 
 export default async function KuisInfo ({params}: { params: Promise<{slug:string}> }) {
   const slug = (await params).slug

@@ -1,5 +1,5 @@
-import BlogContentWrapper from "@/app/components/blog/content/BlogWrapper";
-import GlobalNavbar from "@/app/components/global/Navbar";
+import BlogContentWrapper from "@/components/blog/content/BlogWrapper";
+import GlobalNavbar from "@/components/global/Navbar";
 
 interface BlogClientProps {
   content: string;

@@ -2,11 +2,11 @@
 'use client'
 
 import { useRef, useState } from 'react'
-import { Input } from "../../global/Input"
-import { AutoMD } from "../../utils/Markdown"
-import { blogDummy, blogStructure_ } from '../../interface/blogStructure'
+import { Input } from "@/components/global/Input"
+import { AutoMD } from "@/components/utils/Markdown"
+import { blogDummy, blogStructure_ } from '@/components/interface/blogStructure'
 import { IconUpload, IconX } from '@tabler/icons-react'
-import client from '@/app/lib/auth'
+import client from '@/lib/auth'
 
 const BlogCreate = () => {
 	const [preview, setPreview] = useState(false)	

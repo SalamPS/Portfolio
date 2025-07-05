@@ -1,11 +1,11 @@
 /* eslint-disable @next/next/no-img-element */
 "use client"
 import Link from "next/link";
-import Introduction from "./components/index/introduction";
-import Content from "./components/index/content";
-import IndexBottom from "./components/index/bottom";
-import IndexLogo from "./components/index/logo";
-import ContentPortfolio from "./components/portfolio/content";
+import Introduction from "@/components/index/introduction";
+import Content from "@/components/index/content";
+import IndexBottom from "@/components/index/bottom";
+import IndexLogo from "@/components/index/logo";
+import ContentPortfolio from "@/components/portfolio/content";
 
 const date = new Date();
 const tanggal = date.getDate();

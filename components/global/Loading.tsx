@@ -1,7 +1,7 @@
 'use client'
 
+import { delay } from "@/lib/delay";
 import { useEffect, useState } from "react"
-import { delay } from "../utils/Utilites";
 
 export default function Loading(
 	{children, isLoading}: 

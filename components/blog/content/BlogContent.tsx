@@ -1,9 +1,9 @@
 /* eslint-disable @next/next/no-img-element */
-import { blogAds_, blogStructure_, commentStructure_ } from "@/app/components/interface/blogStructure";
-import { AutoMD } from "../../utils/Markdown";
+import { blogAds_, blogStructure_, commentStructure_ } from "@/components/interface/blogStructure";
 import { IconBookmark, IconHeartPlus } from "@tabler/icons-react";
-import Link from "next/link";
+import { AutoMD } from "@/components/utils/Markdown";
 import AdBanner from "./Adsense";
+import Link from "next/link";
 
 const BlogContent = ({data, ads}: {data: blogStructure_, ads:blogAds_[]}) => {
 	return (

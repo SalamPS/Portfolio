@@ -1,7 +1,7 @@
 'use client'
-import BlogSkeleton from "@/app/components/blog/content/BlogSkeleton";
-import BlogContentWrapper from "@/app/components/blog/content/BlogWrapper";
-import GlobalNavbar from "@/app/components/global/Navbar";
+import BlogSkeleton from "@/components/blog/content/BlogSkeleton";
+import BlogContentWrapper from "@/components/blog/content/BlogWrapper";
+import GlobalNavbar from "@/components/global/Navbar";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 

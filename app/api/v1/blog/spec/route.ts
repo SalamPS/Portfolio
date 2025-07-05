@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import mongoose from 'mongoose';
 import dbConnect from '@/app/api/lib/mongodb';
 import BlogModel from '@/app/api/models/blogModel';
-import { blogStructure_ } from '@/app/components/interface/blogStructure';
+import { blogStructure_ } from '@/components/interface/blogStructure';
 
 // GET - Mendapatkan blog berdasarkan ID
 export async function GET(request: NextRequest) {

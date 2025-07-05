@@ -1,10 +1,10 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { blogStructure_, blogAds_, adsDummy, blog404 } from "@/app/components/interface/blogStructure";
-import BlogSkeleton from '@/app/components/blog/content/BlogSkeleton';
-import BlogContent from "@/app/components/blog/content/BlogContent";
-import client from "@/app/lib/auth";
+import { blogStructure_, blogAds_, adsDummy, blog404 } from "@/components/interface/blogStructure";
+import BlogSkeleton from '@/components/blog/content/BlogSkeleton';
+import BlogContent from "@/components/blog/content/BlogContent";
+import client from "@/lib/auth";
 
 interface BlogContentWrapperProps {
     content: string;

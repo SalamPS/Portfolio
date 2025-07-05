@@ -1,5 +1,5 @@
 import { IconBookmark, IconHeartPlus } from "@tabler/icons-react";
-import { Skeleton } from "../../global/Skeleton";
+import { Skeleton } from "@/components/global/Skeleton";
 
 const BlogSkeleton = () => {
 	return (

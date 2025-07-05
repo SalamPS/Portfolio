@@ -1,7 +1,7 @@
 'use client'
 
-import BlogCreate from "@/app/components/blog/create/BlogCreate";
-import GlobalNavbar from "@/app/components/global/Navbar";
+import BlogCreate from "@/components/blog/create/BlogCreate";
+import GlobalNavbar from "@/components/global/Navbar";
 
 const Page = () => {
 	return (<>

@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { AxiosError } from "axios";
 import { useRouter } from "next/navigation";
-import client from "@/app/lib/auth";
+import client from "@/lib/auth";
 
 export default function Login () {
 	const router = useRouter()
