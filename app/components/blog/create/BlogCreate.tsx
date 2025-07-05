@@ -18,6 +18,7 @@ const BlogCreate = () => {
 		tags: [],
 		thumbnail: '',
 	})
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null)
 
 	const insertionEdit = (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
 		const elementName = e.currentTarget.name;
@@ -63,27 +64,44 @@ const BlogCreate = () => {
 			alert('Thumbnail is required');
 			return;
 		}
+    if (!thumbnailFile) {
+      alert('Thumbnail is required');
+      return;
+    }
+		
+    const formData = new FormData();
+    formData.append('title', blog.title);
+    formData.append('content', blog.content);
+    formData.append('authorId', blog.authorId || '1');
+    formData.append('authorName', blog.authorName);
+    formData.append('tags', JSON.stringify(blog.tags));
+    formData.append('thumbnail', thumbnailFile);
 
-		client.post('blog', blog)
-			.then((response) => {
-				if (response.data.success) {
-					alert('Blog created successfully!');
-					setBlog({
-						title: '',
-						content: '',
-						authorId: '1',
-						authorName: 'SalamPS',
-						tags: [],
-						thumbnail: '',
-					});
-				} else {
-					alert('Failed to create blog: ' + response.data.message);
-				}
-			})
-			.catch((error) => {
-				console.error('Error creating blog:', error);
-				alert('An error occurred while creating the blog. Please try again later.');
-			});
+    client.post('blog', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+      .then((response) => {
+        if (response.data.success) {
+          alert('Blog created successfully!');
+          setBlog({
+            title: '',
+            content: '',
+            authorId: '1',
+            authorName: 'SalamPS',
+            tags: [],
+            thumbnail: '',
+          });
+          setThumbnailFile(null);
+        } else {
+          alert('Failed to create blog: ' + response.data.message);
+        }
+      })
+      .catch((error) => {
+        console.error('Error creating blog:', error);
+        alert('An error occurred while creating the blog. Please try again later.');
+      });
 	}
 
   return (<>
@@ -179,7 +197,7 @@ const BlogCreate = () => {
 							<Input type="text" id="category" name="category" className="w-full" placeholder="e.g. Tutorial, Random Posts" />
 						</div>
 					</div>
-					<ThumbnailController blog={blog} setBlog={setBlog} />
+					<ThumbnailController setThumbnailFile={setThumbnailFile} blog={blog} setBlog={setBlog} />
 					<button type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Create Post</button>
 					<div className='block xl:hidden text-slate-400 text-sm font-bold border-b border-slate-600 pt-12'>
 						{preview ? 'Preview' : 'Editor'}
@@ -191,34 +209,39 @@ const BlogCreate = () => {
 }
 
 const ThumbnailController = ({
-		blog,
-		setBlog
-	}:{
-		blog: Partial<blogStructure_>,
-		setBlog: React.Dispatch<React.SetStateAction<Partial<blogStructure_>>>
-	}) => {
+  blog,
+  setBlog,
+  setThumbnailFile
+}: {
+  blog: Partial<blogStructure_>,
+  setBlog: React.Dispatch<React.SetStateAction<Partial<blogStructure_>>>
+  setThumbnailFile: React.Dispatch<React.SetStateAction<File | null>> // Tambah prop ini
+}) => {
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-	const fileInputRef = useRef<HTMLInputElement>(null);
-
-	const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-		if (e.target.files && e.target.files.length > 0) {
-			const file = e.target.files[0];
-			if (!file.type.startsWith('image/')) {
-				console.error('File yang diunggah bukan gambar.');
-				return;
-			}
-			
-			const reader = new FileReader();
-			reader.readAsDataURL(file);
-			reader.onloadend = () => {
-				const dataUrl = reader.result as string;
-				setBlog((prev) => ({
-					...prev,
-					thumbnail: dataUrl,
-				}));
-			};
-		}
-	};
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0];
+      if (!file.type.startsWith('image/')) {
+        console.error('File yang diunggah bukan gambar.');
+        return;
+      }
+      
+      // Simpan file untuk upload
+      setThumbnailFile(file);
+      
+      // Buat preview
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onloadend = () => {
+        const dataUrl = reader.result as string;
+        setBlog((prev) => ({
+          ...prev,
+          thumbnail: dataUrl, // Hanya untuk preview
+        }));
+      };
+    }
+  };
 
 	const triggerFileUpload = () => {
 		fileInputRef.current?.click();

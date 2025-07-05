@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/app/api/lib/mongodb';
 import BlogModel from '@/app/api/models/blogModel';
+import { writeFile, mkdir } from 'fs/promises';
+import { join } from 'path';
+import { existsSync } from 'fs';
 
 interface BlogQuery_ {
   $or?: Array<{
@@ -73,14 +76,25 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST - Membuat blog baru
+// POST - Membuat blog baru dengan multipart
 export async function POST(request: NextRequest) {
   try {
     await dbConnect();
-    console.log('Received request to create a new blog'); 
+    console.log('Received request to create a new blog');
     
-    const body = await request.json();
-    const { title, content, authorId, authorName, tags } = body;
+    const formData = await request.formData();
+    
+    // Extract form fields
+    const title = formData.get('title') as string;
+    const content = formData.get('content') as string;
+    const authorId = formData.get('authorId') as string;
+    const authorName = formData.get('authorName') as string;
+    const tagsString = formData.get('tags') as string;
+    const thumbnailFile = formData.get('thumbnail') as File;
+    const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    
+    // Parse tags
+    const tags = tagsString ? JSON.parse(tagsString) : [];
     
     // Validasi input
     if (!title || !content || !authorId || !authorName) {
@@ -89,18 +103,50 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-    console.log('Creating new blog with data:', body);
+    
+    if (!thumbnailFile || thumbnailFile.size === 0) {
+      return NextResponse.json(
+        { success: false, message: 'Thumbnail is required' },
+        { status: 400 }
+      );
+    }
+    
+    // Validasi tipe file
+    if (!thumbnailFile.type.startsWith('image/')) {
+      return NextResponse.json(
+        { success: false, message: 'Thumbnail must be an image file' },
+        { status: 400 }
+      );
+    }
+    
+    // Generate unique filename
+    const timestamp = Date.now();
+    const fileName = `${timestamp}-${thumbnailFile.name}`;
+    const uploadDir = join(process.cwd(), 'public', 'blog', 'thumbnails');
+    if (!existsSync(uploadDir)) {
+      await mkdir(uploadDir, { recursive: true });
+      console.log('Created upload directory:', uploadDir);
+    }
+    const filePath = join(uploadDir, fileName);
+    
+    // Save file
+    const bytes = await thumbnailFile.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+    await writeFile(filePath, buffer);
+    
+    // URL untuk thumbnail
+    const thumbnailUrl = `/blog/thumbnails/${fileName}`;
     
     const newBlog = new BlogModel({
       title,
       content,
       authorId,
       authorName,
-      slug: title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
-      tags: tags || []
+      slug,
+      tags,
+      thumbnail: thumbnailUrl
     });
     
-    console.log('New Blog:', newBlog);
     const savedBlog = await newBlog.save();
     
     return NextResponse.json({
@@ -110,8 +156,9 @@ export async function POST(request: NextRequest) {
     }, { status: 201 });
     
   } catch (error: unknown) {
+    console.error('Error creating blog:', error);
     return NextResponse.json(
-      { success: false, message: error },
+      { success: false, message: 'Internal server error' },
       { status: 500 }
     );
   }
