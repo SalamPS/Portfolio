@@ -31,12 +31,6 @@ export default function RootLayout({
       <body
         className={`${tektur.variable} font-[family-name:var(--font-tektur)] antialiased`}
       >
-        <Script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3431571878986276"
-          crossOrigin="anonymous"
-          strategy="afterInteractive"
-        />
         {children}
       </body>
     </html>

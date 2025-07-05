@@ -14,13 +14,16 @@ const AdBanner = ({
   dataFullWidthResponsive,
 }: AdBannerTypes) => {
   useEffect(() => {
-    try {
-      if (typeof window !== 'undefined') {
-        ((window as any).adsbygoogle = (window as any).adsbygoogle || []).push({});
+    const initializeAds = () => {
+      if (typeof window !== "undefined" && (window as any).adsbygoogle) {
+        try {
+          ((window as any).adsbygoogle = (window as any).adsbygoogle || []).push({});
+        } catch (error: any) {
+          console.log(error.message);
+        }
       }
-    } catch (err) {
-      console.log(err);
-    }
+    };
+    initializeAds();
   }, []);
 
   return (
