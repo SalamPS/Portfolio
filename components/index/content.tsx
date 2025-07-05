@@ -19,9 +19,9 @@ const links:_links[] = [
         link: 'https://www.instagram.com/lamp.devs/',
     },
     {
-        name: 'Featured',
-        desc: 'Current project that I am working on, I love to work on it tbh!',
-        link: 'https://netradapt.com/',
+        name: 'LamBlogger',
+        desc: 'Check out our latest blog post!',
+        link: '/blog/how-to-connect-jetson-agx-orin-to-husky-clearpath-a200',
     },
 ]
 
