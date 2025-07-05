@@ -1,4 +1,6 @@
 export interface blogStructure_ {
+	_id?: string,
+	slug?: string,
 	title: string,
 	content: string,
 	authorId: string,

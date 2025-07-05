@@ -3,7 +3,7 @@
 
 const GlobalNavbar = () => {
 	return (
-		<nav className="fixed w-full">
+		<nav className="fixed w-full z-20">
 			<div className="flex justify-between items-center px-12 py-4 bg-gray-800 text-white">
 				<div className="h-8">
 					<img src="/assets/lamp.png" alt="LamP" className="h-full aspect-square" />
