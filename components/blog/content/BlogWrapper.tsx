@@ -22,10 +22,6 @@ const BlogContentWrapper = ({ content }: BlogContentWrapperProps) => {
 		cacheTime: 10 * 60 * 1000,
 	});
 
-	useEffect(() => {
-		console.log('Blog data fetched:', data);
-	}, [data])
-
 	const blogData: blogStructure_ = data?.blog || (error ? blog404 : {} as blogStructure_);
 	const blogAds: blogAds_[] = data?.ads || (error ? adsDummy : []);
 
