@@ -73,6 +73,7 @@ const BlogCreate = () => {
     formData.append('content', blog.content);
     formData.append('authorId', blog.authorId || '1');
     formData.append('authorName', blog.authorName);
+		formData.append('category', blog.category || 'General');
     formData.append('tags', JSON.stringify(blog.tags));
     formData.append('thumbnail', thumbnailFile);
 

@@ -14,7 +14,7 @@ const GlobalNavbar = ({children, space, logo}: {children?: React.ReactNode, spac
 				<ul className="flex space-x-8">
 					{children ? children : 
 					(<>
-						<li><a href="/" className="hover:underline">Blog</a></li>
+						<li><a href="/blog" className="hover:underline">Blog</a></li>
 						<li><a href="/" className="hover:underline">Reach me</a></li>
 					</>)}
 				</ul>
