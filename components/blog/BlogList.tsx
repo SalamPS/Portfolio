@@ -52,7 +52,7 @@ const BlogList = () => {
 						{!isLoading && !isError && (
 							<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 								{blogPosts.length > 0 ? (
-									blogPosts.map((post: blogStructure_, index: number) => (<>
+									blogPosts.map((post: blogStructure_, index: number) => (
 										<div key={post._id} className={index === 1 ? 'z-10 grid grid-cols-2 gap-6 col-span-2' : 'col-span-1'}>
 											<Link className="block shadow-lg hover:shadow-xl hover:scale-[1.01] duration-200 rounded-lg overflow-hidden border border-slate-600"
 												href={`/blog/${post.slug}`}>
@@ -83,7 +83,7 @@ const BlogList = () => {
 												</div>
 											}
 										</div>
-									</>))
+									))
 								) : (
 									<div className="col-span-2 text-center py-10 text-gray-500">
 										No blog posts found.
