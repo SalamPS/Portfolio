@@ -8,8 +8,8 @@ import Link from "next/link";
 const BlogContent = ({data, ads}: {data: blogStructure_, ads:blogAds_[]}) => {
 	return (
 		<>
-			<div className="flex flex-col xl:flex-row px-8 py-24 xl:py-36 xl:px-28 gap-4 xl:gap-8">
-				<section id="stats" className="flex flex-row xl:flex-col order-2 xl:order-1 items-center justify-start gap-6">
+			<div className="grid grid-cols-1 xl:grid-cols-12 px-8 py-24 xl:py-36 xl:px-28 gap-4 xl:gap-8">
+				<section id="stats" className="xl:col-span-1 flex flex-row xl:flex-col order-2 xl:order-1 items-center justify-start gap-6">
 					<div className="flex xl:flex-col gap-2 xl:gap-1 items-center justify-center">
 						<div className="xl:bg-slate-700 xl:p-4 rounded-full">
 							<IconHeartPlus/>
@@ -24,7 +24,7 @@ const BlogContent = ({data, ads}: {data: blogStructure_, ads:blogAds_[]}) => {
 						{data?.saves}
 					</div>
 				</section>
-				<main className="grow order-1 xl:order-2">
+				<main id="content" className="xl:col-span-8 order-1 xl:order-2">
 					<h1 className="text-4xl font-bold mb-2">{data?.title}</h1>
 					<p>
 						Posted by {data?.authorName} at {new Date(data?.createdAt || '').toLocaleDateString()}
@@ -60,7 +60,7 @@ const BlogContent = ({data, ads}: {data: blogStructure_, ads:blogAds_[]}) => {
 					</div>
 				</main>
 				
-				<section id="ads" className="w-full order-last xl:w-96 flex flex-col gap-4">
+				<section id="ads" className="xl:col-span-3 w-full order-last xl:w-96 grid grid-cols-2 md:grid-cols-3 xl:grid-cols-1 gap-4">
 					<div className="w-full aspect-square bg-slate-100 rounded shadow">
 						<AdBanner
 							dataAdSlot="8897271609"

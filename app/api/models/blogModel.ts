@@ -13,8 +13,8 @@ const BlogSchema = new mongoose.Schema({
 		content: { type: String, required: true },
 		createdAt: { type: Date, default: Date.now }
 	}],
-	likes: { type: Number, default: 0 },
-	saves: { type: Number, default: 0 },
+	likes: [{ type: String, required: true }],
+	saves: [{ type: String, required: true }],
 	tags: [{ type: String, required: true }],
 	thumbnail: { type: String, default: '' },
 	slug: { type: String, required: true },
