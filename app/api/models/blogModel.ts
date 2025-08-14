@@ -13,6 +13,7 @@ const BlogSchema = new mongoose.Schema({
 		content: { type: String, required: true },
 		createdAt: { type: Date, default: Date.now }
 	}],
+	category: { type: String, required: true },
 	likes: [{ type: String, required: true }],
 	saves: [{ type: String, required: true }],
 	tags: [{ type: String, required: true }],

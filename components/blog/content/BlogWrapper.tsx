@@ -5,6 +5,7 @@ import { blogStructure_, blogAds_, adsDummy, blog404 } from "@/components/interf
 import BlogSkeleton from '@/components/blog/content/BlogSkeleton';
 import BlogContent from "@/components/blog/content/BlogContent";
 import client from "@/lib/auth";
+import { useEffect } from 'react';
 
 interface BlogContentWrapperProps {
     content: string;
@@ -20,6 +21,10 @@ const BlogContentWrapper = ({ content }: BlogContentWrapperProps) => {
 		staleTime: 5 * 60 * 1000,
 		cacheTime: 10 * 60 * 1000,
 	});
+
+	useEffect(() => {
+		console.log('Blog data fetched:', data);
+	}, [data])
 
 	const blogData: blogStructure_ = data?.blog || (error ? blog404 : {} as blogStructure_);
 	const blogAds: blogAds_[] = data?.ads || (error ? adsDummy : []);

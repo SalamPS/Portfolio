@@ -10,8 +10,8 @@ export interface blogStructure_ {
 	comments: commentStructure_[],
 	tags: string[],
 	category: string,
-	likes: number,
-	saves: number,
+	likes: string[],
+	saves: string[],
 	thumbnail: string,
 }
 
@@ -38,8 +38,8 @@ export const blogDummy:blogStructure_ = {
 	tags: ['dummy', 'blog', 'tags'],
 	category: 'LamP Post',
 	comments: [],
-	likes: 0,
-	saves: 0,
+	likes: [],
+	saves: [],
 	thumbnail: '/blog/thumbnail-1.png',
 	content: 
 `
@@ -60,8 +60,8 @@ export const blog404:blogStructure_ = {
 	tags: ['404', 'not', 'found'],
 	category: 'LamP Post',
 	comments: [],
-	likes: 0,
-	saves: 0,
+	likes: [],
+	saves: [],
 	thumbnail: '/blog/thumbnail-1.png',
 	content: 
 `

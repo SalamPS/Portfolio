@@ -14,14 +14,14 @@ const BlogContent = ({data, ads}: {data: blogStructure_, ads:blogAds_[]}) => {
 						<div className="xl:bg-slate-700 xl:p-4 rounded-full">
 							<IconHeartPlus/>
 						</div>
-						{data?.likes}
+						{data?.likes?.length || 0}
 					</div>
 					
 					<div className="flex xl:flex-col gap-2 xl:gap-1 items-center justify-center">
 						<div className="xl:bg-slate-700 xl:p-4 rounded-full">
 							<IconBookmark/>
 						</div>
-						{data?.saves}
+						{data?.saves?.length || 0}
 					</div>
 				</section>
 				<main id="content" className="xl:col-span-8 order-1 xl:order-2">
