@@ -7,6 +7,7 @@ import client from "@/lib/auth";
 import { useState } from "react";
 import ReactPaginate from "react-paginate";
 import { useQuery } from "@tanstack/react-query";
+import { Skeleton } from "../global/Skeleton";
 
 const BlogList = () => {
   const [currentPage, setCurrentPage] = useState(0);
@@ -26,6 +27,22 @@ const BlogList = () => {
     window.scrollTo(0, 0); // Scroll to top on page change
   };
 
+  // Blog skeleton component
+  const BlogCardSkeleton = () => (
+    <div className="block shadow-lg rounded-lg overflow-hidden border border-slate-600">
+      <Skeleton className="w-full aspect-video bg-slate-300" />
+      <div className="p-4">
+        <Skeleton className="h-6 bg-slate-300 rounded mb-2" />
+        <Skeleton className="h-4 bg-slate-300 rounded w-24 mb-2" />
+        <div className="flex gap-2">
+          <Skeleton className="h-6 bg-slate-300 rounded-full w-16" />
+          <Skeleton className="h-6 bg-slate-300 rounded-full w-20" />
+          <Skeleton className="h-6 bg-slate-300 rounded-full w-14" />
+        </div>
+      </div>
+    </div>
+  );
+
   return (<>
 		<div className="px-8 py-24 xl:py-32 xl:px-28 grid grid-cols-1 xl:grid-cols-4 gap-8 xl:gap-12">
 			<div className="col-span-3">
@@ -34,10 +51,19 @@ const BlogList = () => {
 				<div className="flex flex-col xl:flex-row gap-4 xl:gap-8 ">
 					<main className="w-full">
 
-						{/* Loading state */}
+						{/* Loading state with skeleton */}
 						{isLoading && (
-							<div className="flex justify-center items-center min-h-[200px]">
-								<div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+							<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+								{Array.from({ length: ITEMS_PER_PAGE }).map((_, index) => (
+									<div key={index} className={index === 1 ? 'z-10 grid grid-cols-2 gap-6 col-span-2' : 'col-span-1'}>
+										<BlogCardSkeleton />
+										{index === 1 && (
+											<div className="w-full h-auto bg-slate-100 rounded shadow">
+												<Skeleton className="w-full h-48 bg-slate-300 rounded" />
+											</div>
+										)}
+									</div>
+								))}
 							</div>
 						)}
 
@@ -74,7 +100,7 @@ const BlogList = () => {
 												</div>
 											</Link>
 											{index === 1 && 
-												<div className="w-full h-auto bg-slate-100 rounded shadow">
+												<div className="w-full h-auto bg-slate-600 rounded shadow">
 													<AdBanner
 														dataAdSlot="8897271609"
 														dataAdFormat="auto"
