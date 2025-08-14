@@ -97,8 +97,7 @@ const BlogEdit = ({ initialBlog }: BlogEditProps) => {
     const formData = new FormData();
     formData.append('title', blog.title);
     formData.append('content', blog.content);
-    formData.append('authorId', blog.authorId || '1');
-    formData.append('authorName', blog.authorName);
+		formData.append('authorId', blog.authorId || '');
 		formData.append('category', blog.category || 'General');
     formData.append('tags', JSON.stringify(blog.tags));
     
@@ -108,7 +107,7 @@ const BlogEdit = ({ initialBlog }: BlogEditProps) => {
     }
 
     // Update blog berdasarkan slug
-    client.put(`blog/${initialBlog.slug}`, formData, {
+    client.put(`blog/${initialBlog._id}`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
