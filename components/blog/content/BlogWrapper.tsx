@@ -5,7 +5,6 @@ import { blogStructure_, blogAds_, adsDummy, blog404 } from "@/components/interf
 import BlogSkeleton from '@/components/blog/content/BlogSkeleton';
 import BlogContent from "@/components/blog/content/BlogContent";
 import client from "@/lib/auth";
-import { useEffect } from 'react';
 
 interface BlogContentWrapperProps {
     content: string;
