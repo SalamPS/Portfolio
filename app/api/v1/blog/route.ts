@@ -89,6 +89,7 @@ export async function POST(request: NextRequest) {
     const content = formData.get('content') as string;
     const authorId = formData.get('authorId') as string;
     const authorName = formData.get('authorName') as string;
+    const category = formData.get('category') as string;
     const tagsString = formData.get('tags') as string;
     const thumbnailFile = formData.get('thumbnail') as File;
     const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -141,6 +142,7 @@ export async function POST(request: NextRequest) {
       content,
       authorId,
       authorName,
+      category,
       slug,
       tags,
       thumbnail: thumbnailUrl

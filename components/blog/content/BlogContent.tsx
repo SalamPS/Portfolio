@@ -60,7 +60,7 @@ const BlogContent = ({data, ads}: {data: blogStructure_, ads:blogAds_[]}) => {
 					</div>
 				</main>
 				
-				<section id="ads" className="xl:col-span-3 w-full order-last xl:w-96 grid grid-cols-2 md:grid-cols-3 xl:grid-cols-1 gap-4">
+				<section id="ads" className="xl:col-span-3 w-full order-last xl:w-96 grid grid-cols-2 md:grid-cols-3 xl:grid-cols-1 gap-4 h-fit">
 					<div className="w-full aspect-square bg-slate-100 rounded shadow">
 						<AdBanner
 							dataAdSlot="8897271609"
@@ -70,9 +70,11 @@ const BlogContent = ({data, ads}: {data: blogStructure_, ads:blogAds_[]}) => {
 					</div>
 					{ads && (
 						ads.map((ad, index) => (
-							<Link key={index} href={ad.adsLink} target="_blank" rel="noopener noreferrer" className="bg-slate-500 rounded shadow hover:shadow-lg transition-shadow">
-								<img src={ad.adsImageLink} alt={ad.adsTitle} className="w-full object-cover rounded"/>
-							</Link>
+							<div key={index}>
+								<Link href={ad.adsLink} target="_blank" rel="noopener noreferrer" className="rounded shadow hover:shadow-lg transition-shadow">
+									<img src={ad.adsImageLink} alt={ad.adsTitle} className="w-full object-cover rounded"/>
+								</Link>
+							</div>
 						))
 					)}					
 				</section>
