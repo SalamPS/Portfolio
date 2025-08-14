@@ -3,17 +3,32 @@
 import Link from "next/link";
 import { blogStructure_ } from "../interface/blogStructure";
 import client from "@/lib/auth";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import ReactPaginate from "react-paginate";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "../global/Skeleton";
+import { IconPencil } from '@tabler/icons-react';
 
 const BlogList = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState("newest");
+  const [isAdmin, setIsAdmin] = useState(false);
   const ITEMS_PER_PAGE = 6;
+
+  // Check if user is admin
+  useEffect(() => {
+    const checkAdmin = async () => {
+      try {
+        const response = await client.get('/auth/admin/ver');
+        setIsAdmin(response.data.success);
+      } catch {
+        setIsAdmin(false);
+      }
+    };
+    checkAdmin();
+  }, []);
 
   // Use react-query to fetch all blog posts (we'll filter client-side for better UX)
   const { data, isLoading, isError } = useQuery({
@@ -214,7 +229,7 @@ const BlogList = () => {
 							<div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-6">
 								{blogPosts.length > 0 ? (
 									blogPosts.map((post: blogStructure_) => (
-										<div key={post._id}>
+										<div key={post._id} className="relative">
 											<Link className="block shadow-lg hover:shadow-xl hover:scale-[1.01] duration-200 rounded-lg overflow-hidden border border-slate-600"
 												href={`/blog/${post.slug}`}>
 												<div className="w-full aspect-video bg-cover bg-center">
@@ -234,6 +249,17 @@ const BlogList = () => {
 													</div>
 												</div>
 											</Link>
+											
+											{/* Edit Button for Admin */}
+											{isAdmin && (
+												<Link 
+													href={`/blog/edit/${post.slug}`}
+													className="absolute top-2 right-2 bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-full shadow-lg transition-colors z-10"
+													title="Edit Blog Post"
+												>
+													<IconPencil size={16} />
+												</Link>
+											)}
 										</div>
 									))
 								) : (

@@ -1,7 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
 'use client'
 
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Input } from "@/components/global/Input"
 import { AutoMD } from "@/components/utils/Markdown"
 import { blogDummy, blogStructure_ } from '@/components/interface/blogStructure'
@@ -9,15 +10,15 @@ import { IconUpload, IconX } from '@tabler/icons-react'
 import { NotificationModal } from '@/components/global/Modal'
 import client from '@/lib/auth'
 
-const BlogCreate = () => {
+interface BlogEditProps {
+	initialBlog: blogStructure_
+}
+
+const BlogEdit = ({ initialBlog }: BlogEditProps) => {
+	const router = useRouter()
 	const [preview, setPreview] = useState(false)	
 	const [blog, setBlog] = useState<Partial<blogStructure_>>({
-		title: '',
-		content: '',
-		authorId: '1',
-		authorName: 'SalamPS',
-		tags: [],
-		thumbnail: '',
+		...initialBlog,
 	})
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null)
   const [notification, setNotification] = useState<{
@@ -31,6 +32,10 @@ const BlogCreate = () => {
     title: '',
     message: ''
   })
+
+	useEffect(() => {
+		console.log('Initial blog data:', initialBlog)
+	}, [initialBlog])
 
   const showNotification = (type: 'success' | 'error' | 'warning' | 'info', title: string, message: string) => {
     setNotification({
@@ -84,14 +89,10 @@ const BlogCreate = () => {
 			showNotification('error', 'Validation Error', 'At least one tag is required');
 			return;
 		}
-		if (!blog.thumbnail) {
+		if (!blog.thumbnail && !thumbnailFile) {
 			showNotification('error', 'Validation Error', 'Thumbnail is required');
 			return;
 		}
-    if (!thumbnailFile) {
-      showNotification('error', 'Validation Error', 'Thumbnail file is required');
-      return;
-    }
 		
     const formData = new FormData();
     formData.append('title', blog.title);
@@ -100,32 +101,32 @@ const BlogCreate = () => {
     formData.append('authorName', blog.authorName);
 		formData.append('category', blog.category || 'General');
     formData.append('tags', JSON.stringify(blog.tags));
-    formData.append('thumbnail', thumbnailFile);
+    
+    // Hanya append thumbnail file jika ada file baru yang dipilih
+    if (thumbnailFile) {
+      formData.append('thumbnail', thumbnailFile);
+    }
 
-    client.post('blog', formData, {
+    // Update blog berdasarkan slug
+    client.put(`blog/${initialBlog.slug}`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
     })
       .then((response) => {
         if (response.data.success) {
-          showNotification('success', 'Success', 'Blog created successfully!');
-          setBlog({
-            title: '',
-            content: '',
-            authorId: '1',
-            authorName: 'SalamPS',
-            tags: [],
-            thumbnail: '',
-          });
-          setThumbnailFile(null);
+          showNotification('success', 'Success', 'Blog updated successfully!');
+          // Redirect ke blog setelah berhasil update
+          setTimeout(() => {
+            router.push(`/blog/${initialBlog.slug}`);
+          }, 2000);
         } else {
-          showNotification('error', 'Create Failed', response.data.message || 'Failed to create blog');
+          showNotification('error', 'Update Failed', response.data.message || 'Failed to update blog');
         }
       })
       .catch((error) => {
-        console.error('Error creating blog:', error);
-        showNotification('error', 'Error', 'An error occurred while creating the blog. Please try again later.');
+        console.error('Error updating blog:', error);
+        showNotification('error', 'Error', 'An error occurred while updating the blog. Please try again later.');
       });
 	}
 
@@ -196,7 +197,7 @@ const BlogCreate = () => {
 				</main>
 				<div className='flex flex-col gap-4 order-1 xl:order-2'>
 					<div>
-						<span className="block text-slate-400 text-end text-sm font-bold mb-2">Blog Utilites</span>
+						<span className="block text-slate-400 text-end text-sm font-bold mb-2">Blog Utilities</span>
 						<button className={`w-full px-4 py-3 rounded-xl text-white font-bold focus:outline-none focus:shadow-outline duration-200 ${preview ? 'bg-emerald-700 hover:bg-emerald-600' : 'bg-slate-500/20 hover:bg-slate-500/30'}`}
 							onClick={(e) => {e.preventDefault(); setPreview(!preview);}}>
 							Toggle Preview
@@ -226,11 +227,18 @@ const BlogCreate = () => {
 						</div>
 						<div className='flex flex-col gap-1'>
 							<label className="block text-slate-400 text-sm font-bold" htmlFor="category">Category</label>
-							<Input type="text" id="category" name="category" className="w-full" placeholder="e.g. Tutorial, Random Posts" />
+							<Input type="text" id="category" name="category" className="w-full" placeholder="e.g. Tutorial, Random Posts" value={blog.category || ''} onChange={insertionEdit} />
 						</div>
 					</div>
 					<ThumbnailController setThumbnailFile={setThumbnailFile} blog={blog} setBlog={setBlog} />
-					<button type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Create Post</button>
+					<button type="submit" className="bg-emerald-500 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Update Post</button>
+					<button 
+						type="button" 
+						onClick={() => router.back()}
+						className="bg-slate-500 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+					>
+						Cancel
+					</button>
 					<div className='block xl:hidden text-slate-400 text-sm font-bold border-b border-slate-600 pt-12'>
 						{preview ? 'Preview' : 'Editor'}
 					</div>
@@ -247,7 +255,7 @@ const ThumbnailController = ({
 }: {
   blog: Partial<blogStructure_>,
   setBlog: React.Dispatch<React.SetStateAction<Partial<blogStructure_>>>
-  setThumbnailFile: React.Dispatch<React.SetStateAction<File | null>> // Tambah prop ini
+  setThumbnailFile: React.Dispatch<React.SetStateAction<File | null>>
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -300,4 +308,4 @@ const ThumbnailController = ({
 	</>)
 }
 
-export default BlogCreate
+export default BlogEdit
