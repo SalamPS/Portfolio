@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "zip": "rm -rf .next next.zip && bun run build && zip -r next.zip .next/",
+    "prod": "rm -rf .next && next build && next start"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.14",
