@@ -20,8 +20,8 @@ const links:_links[] = [
     },
     {
         name: 'LamBlogger',
-        desc: 'Check out our latest blog post!',
-        link: '/blog/how-to-connect-jetson-agx-orin-to-husky-clearpath-a200',
+        desc: 'Check out our latest blog posts!',
+        link: '/blog/',
     },
 ]
 
