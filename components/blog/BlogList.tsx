@@ -5,9 +5,10 @@ import { blogStructure_ } from "../interface/blogStructure";
 import client from "@/lib/auth";
 import { useState, useMemo, useEffect } from "react";
 import ReactPaginate from "react-paginate";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Skeleton } from "../global/Skeleton";
-import { IconPencil } from '@tabler/icons-react';
+import { IconPencil, IconTrash } from '@tabler/icons-react';
+import { Modal } from "../global/Modal";
 
 const BlogList = () => {
   const [currentPage, setCurrentPage] = useState(0);
@@ -15,7 +16,11 @@ const BlogList = () => {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState("newest");
   const [isAdmin, setIsAdmin] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [postToDelete, setPostToDelete] = useState<blogStructure_ | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const ITEMS_PER_PAGE = 6;
+  const queryClient = useQueryClient();
 
   // Check if user is admin
   useEffect(() => {
@@ -29,6 +34,22 @@ const BlogList = () => {
     };
     checkAdmin();
   }, []);
+
+  // Delete mutation
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      return await client.delete(`/blog/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['blogs'] });
+      setShowDeleteModal(false);
+      setPostToDelete(null);
+    },
+    onError: (error) => {
+      console.error('Failed to delete post:', error);
+      // You can add toast notification here
+    }
+  });
 
   // Use react-query to fetch all blog posts (we'll filter client-side for better UX)
   const { data, isLoading, isError } = useQuery({
@@ -105,6 +126,29 @@ const BlogList = () => {
   const handleSortChange = (value: string) => {
     setSortBy(value);
     setCurrentPage(0); // Reset to first page when sort changes
+  };
+
+  const handleDeleteClick = (post: blogStructure_) => {
+    setPostToDelete(post);
+    setShowDeleteModal(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (postToDelete && postToDelete._id) {
+      setIsDeleting(true);
+      try {
+        await deleteMutation.mutateAsync(postToDelete._id);
+      } catch (error) {
+        console.error('Delete failed:', error);
+      } finally {
+        setIsDeleting(false);
+      }
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    setShowDeleteModal(false);
+    setPostToDelete(null);
   };
 
   // Blog skeleton component
@@ -252,13 +296,25 @@ const BlogList = () => {
 											
 											{/* Edit Button for Admin */}
 											{isAdmin && (
-												<Link 
-													href={`/blog/edit/${post.slug}`}
-													className="absolute top-2 right-2 bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-full shadow-lg transition-colors z-10"
-													title="Edit Blog Post"
-												>
-													<IconPencil size={16} />
-												</Link>
+												<div className="absolute top-2 right-2 flex gap-2">
+													<Link 
+														href={`/blog/edit/${post.slug}`}
+														className="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-full shadow-lg transition-colors z-10"
+														title="Edit Blog Post"
+													>
+														<IconPencil size={16} />
+													</Link>
+													<button
+														onClick={(e) => {
+															e.preventDefault();
+															handleDeleteClick(post);
+														}}
+														className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-full shadow-lg transition-colors z-10"
+														title="Delete Blog Post"
+													>
+														<IconTrash size={16} />
+													</button>
+												</div>
 											)}
 										</div>
 									))
@@ -292,6 +348,45 @@ const BlogList = () => {
 				</div>
 			</div>
 		</div>
+
+		{/* Delete Confirmation Modal */}
+		{showDeleteModal && postToDelete && (
+			<Modal
+				isOpen={showDeleteModal}
+				onClose={handleDeleteCancel}
+				title="Delete Blog Post"
+			>
+				<div className="">
+					<p className="text-gray-300 mb-6">
+						Are you sure you want to delete &ldquo;<strong>{postToDelete.title}</strong>&rdquo;? 
+						This action cannot be undone.
+					</p>
+					<div className="flex gap-3 justify-end">
+						<button
+							onClick={handleDeleteCancel}
+							disabled={isDeleting}
+							className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors disabled:opacity-50"
+						>
+							Cancel
+						</button>
+						<button
+							onClick={handleDeleteConfirm}
+							disabled={isDeleting}
+							className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors disabled:opacity-50 flex items-center gap-2"
+						>
+							{isDeleting ? (
+								<>
+									<div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+									Deleting...
+								</>
+							) : (
+								'Delete'
+							)}
+						</button>
+					</div>
+				</div>
+			</Modal>
+		)}
   </>)
 }
 
