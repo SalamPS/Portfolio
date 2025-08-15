@@ -12,8 +12,9 @@ export const metadata: Metadata = {
 async function getBlogBySlug(slug: string) {
 	// Dalam implementasi nyata, ini akan mengambil data dari database
 	return client
-		.get(`${process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'}/api/v1/blog/spec?slug=${slug}`)
+		.get(`/blog/spec?slug=${slug}`)
 		.then((response) => {
+			console.log('Blog data:', response)
 			const data = response.data
 			return data.success ? data.data.blog : null
 		})
