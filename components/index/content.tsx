@@ -36,7 +36,7 @@ export default function Content () {
                     key={item.link}
                     href={item.link}
                     className="py-1 md:py-3 pl-4 md:pl-6 pr-4 md:pr-10 border-l-2 border-gray-400 hover:border-white transition-colors hover:translate-y-[-4px] md:text-start flex flex-col gap-2 rounded-r-xl hover:bg-[#313b5d33]"
-                    target="_blank"
+                    target={item.link.startsWith('http') ? '_blank' : '_self'}
                     rel="noopener noreferrer"
                     initial={{ opacity: 0, x: -20 }}
                     whileInView={{ opacity: 1, x: 0 }}
