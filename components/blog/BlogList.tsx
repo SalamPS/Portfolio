@@ -169,8 +169,8 @@ const BlogList = () => {
 
   return (<>
 		<div className="px-8 xl:px-28 py-12 md:py-24 xl:py-32 grid grid-cols-1 xl:grid-cols-6 gap-4 xl:gap-8">
-			<div className="xl:col-span-2">
-				<section id="filter" className="border mb-8 border-slate-600 rounded-lg">
+			<div className="xl:col-span-2 flex flex-col gap-4">
+				<section id="filter" className="border border-slate-600 rounded-lg">
 					<div className="flex flex-col gap-4 p-6">
 						{/* Search Input */}
 						<div className="space-y-2">
@@ -241,6 +241,20 @@ const BlogList = () => {
 						</div>
 					</div>
 				</section>
+
+				{
+					isAdmin && (
+						<div id="admin-menu flex" className="flex justify-stretch">
+							<Link
+								href="/blog/create"
+								className="bg-[#0f6252] text-white px-4 py-2 text-center w-full rounded-md hover:bg-[#0f6252]/80 transition"
+							>
+								Create New Post
+							</Link>
+						</div>
+					)
+				}
+
 				<div className="w-full aspect-square border flex items-center justify-center border-slate-600 bg-slate-800/40 rounded shadow text-slate-400">
 					No ads available
 				</div>

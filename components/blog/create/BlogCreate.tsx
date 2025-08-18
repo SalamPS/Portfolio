@@ -1,13 +1,17 @@
 /* eslint-disable @next/next/no-img-element */
 'use client'
 
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect, useCallback } from 'react'
 import { Input } from "@/components/global/Input"
-import { AutoMD } from "@/components/utils/Markdown"
 import { blogDummy, blogStructure_ } from '@/components/interface/blogStructure'
-import { IconUpload, IconX } from '@tabler/icons-react'
+import { IconUpload, IconX, IconDeviceFloppy, IconFileText } from '@tabler/icons-react'
 import { NotificationModal } from '@/components/global/Modal'
 import client from '@/lib/auth'
+import BlockEditor from './AdvancedBlockEditor'
+import { markdownToBlocks } from './blockUtils'
+import BlockPreview from './BlockPreview'
+import DraftManager from './DraftManager'
+import { saveDraft, autoSaveDraft, getCurrentDraft, BlogDraft } from './draftUtils'
 
 const BlogCreate = () => {
 	const [preview, setPreview] = useState(false)	
@@ -20,6 +24,9 @@ const BlogCreate = () => {
 		thumbnail: '',
 	})
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null)
+  const [isDraftManagerOpen, setIsDraftManagerOpen] = useState(false)
+  const [currentDraftId, setCurrentDraftId] = useState<string | null>(null)
+  const [lastAutoSave, setLastAutoSave] = useState<Date | null>(null)
   const [notification, setNotification] = useState<{
     isOpen: boolean
     type: 'success' | 'error' | 'warning' | 'info'
@@ -32,6 +39,50 @@ const BlogCreate = () => {
     message: ''
   })
 
+  // Load current draft on component mount
+  useEffect(() => {
+    const currentDraft = getCurrentDraft(false) // isEdit = false untuk create
+    if (currentDraft) {
+      setBlog({
+        title: currentDraft.title,
+        content: currentDraft.content,
+        authorId: currentDraft.authorId,
+        authorName: currentDraft.authorName,
+        tags: currentDraft.tags,
+        thumbnail: currentDraft.thumbnail,
+      })
+      setCurrentDraftId(currentDraft.id)
+    }
+  }, [])
+
+  // Auto-save draft when blog content changes
+  useEffect(() => {
+    if (blog.title || blog.content) {
+      const timer = setTimeout(() => {
+        const draftId = autoSaveDraft({
+          id: currentDraftId || undefined,
+          title: blog.title || '',
+          content: blog.content || '',
+          authorId: blog.authorId || '1',
+          authorName: blog.authorName || 'SalamPS',
+          tags: blog.tags || [],
+          thumbnail: blog.thumbnail || '',
+        }, false) // isEdit = false untuk create
+        
+        if (!currentDraftId) {
+          setCurrentDraftId(draftId)
+        }
+        setLastAutoSave(new Date())
+      }, 2000) // Auto-save after 2 seconds of inactivity
+
+      return () => clearTimeout(timer)
+    }
+  }, [blog.title, blog.content, blog.tags, blog.thumbnail, blog.authorId, blog.authorName, currentDraftId])
+
+  const handleContentChange = useCallback((markdown: string) => {
+    setBlog(prev => ({ ...prev, content: markdown }))
+  }, [])
+
   const showNotification = (type: 'success' | 'error' | 'warning' | 'info', title: string, message: string) => {
     setNotification({
       isOpen: true,
@@ -43,6 +94,37 @@ const BlogCreate = () => {
 
   const closeNotification = () => {
     setNotification(prev => ({ ...prev, isOpen: false }))
+  }
+
+  const handleManualSave = () => {
+    const draftId = saveDraft({
+      id: currentDraftId || undefined,
+      title: blog.title || '',
+      content: blog.content || '',
+      authorId: blog.authorId || '1',
+      authorName: blog.authorName || 'SalamPS',
+      tags: blog.tags || [],
+      thumbnail: blog.thumbnail || '',
+    }, false) // isEdit = false untuk create
+    
+    if (!currentDraftId) {
+      setCurrentDraftId(draftId)
+    }
+    
+    showNotification('success', 'Draft Saved', 'Your draft has been saved successfully!')
+  }
+
+  const handleLoadDraft = (draft: BlogDraft) => {
+    setBlog({
+      title: draft.title,
+      content: draft.content,
+      authorId: draft.authorId,
+      authorName: draft.authorName,
+      tags: draft.tags,
+      thumbnail: draft.thumbnail,
+    })
+    setCurrentDraftId(draft.id)
+    showNotification('info', 'Draft Loaded', `Draft "${draft.title || 'Untitled'}" has been loaded`)
   }
 
 	const insertionEdit = (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
@@ -137,7 +219,13 @@ const BlogCreate = () => {
 			title={notification.title}
 			message={notification.message}
 		/>
-			<div className="flex flex-col xl:flex-row px-8 pt-24 xl:py-36 xl:px-28 gap-4 xl:gap-8">
+		<DraftManager
+			isOpen={isDraftManagerOpen}
+			onClose={() => setIsDraftManagerOpen(false)}
+			onLoadDraft={handleLoadDraft}
+			currentBlog={blog}
+		/>
+		<div className="flex flex-col xl:flex-row px-8 pt-24 xl:py-36 xl:px-28 gap-4 xl:gap-8">
       <form className="grid grid-cols-1 xl:grid-cols-3 gap-8 w-full" onSubmit={handleSubmit}>
 				<main className='xl:col-span-2 order-2 xl:order-1'>
 					{!preview ? <>
@@ -147,13 +235,13 @@ const BlogCreate = () => {
 						</section>
 						<section id='md-editor' className='group'>
 							<label className="block text-slate-400 text-sm font-bold mb-2" htmlFor="content">Content</label>
-
-							<div className='flex gap-2 rounded-t-lg bg-slate-400/20 p-3 duration-200'>
-
-							</div>
-							<textarea className="w-full h-80 p-4 border rounded-b-lg outline-none resize-none bg-transparent duration-200 border-slate-400/30" 
-								required name="content" id="content" onChange={insertionEdit} value={blog['content']} >
-							</textarea>
+							<BlockEditor
+								initialContent={blog.content || ''}
+								onChange={handleContentChange}
+								placeholder="Start writing your blog content..."
+								autoSave={true}
+								autoSaveInterval={10000}
+							/>
 						</section>
 					</> : <>
 						<section id='md-preview' className='h-[70vh] overflow-y-scroll'>
@@ -184,7 +272,7 @@ const BlogCreate = () => {
 							}
 							</div>
 							<div className='my-6 xl:my-8 flex flex-col gap-2'>
-								<AutoMD content={blog['content'] || blogDummy.content} />
+								<BlockPreview blocks={markdownToBlocks(blog.content || blogDummy.content)} />
 							</div>
 							
 							<div className="mt-4">
@@ -196,11 +284,34 @@ const BlogCreate = () => {
 				</main>
 				<div className='flex flex-col gap-4 order-1 xl:order-2'>
 					<div>
-						<span className="block text-slate-400 text-end text-sm font-bold mb-2">Blog Utilites</span>
-						<button className={`w-full px-4 py-3 rounded-xl text-white font-bold focus:outline-none focus:shadow-outline duration-200 ${preview ? 'bg-emerald-700 hover:bg-emerald-600' : 'bg-slate-500/20 hover:bg-slate-500/30'}`}
-							onClick={(e) => {e.preventDefault(); setPreview(!preview);}}>
-							Toggle Preview
-						</button>
+						<span className="block text-slate-400 text-end text-sm font-bold mb-2">Blog Utilities</span>
+						<div className="space-y-2">
+							<button className={`w-full px-4 py-3 rounded-xl text-white font-bold focus:outline-none focus:shadow-outline duration-200 ${preview ? 'bg-emerald-700 hover:bg-emerald-600' : 'bg-slate-500/20 hover:bg-slate-500/30'}`}
+								onClick={(e) => {e.preventDefault(); setPreview(!preview);}}>
+								Toggle Preview
+							</button>
+							<button 
+								type="button"
+								onClick={handleManualSave}
+								className="w-full px-4 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold focus:outline-none focus:shadow-outline duration-200 flex items-center justify-center gap-2"
+							>
+								<IconDeviceFloppy size={16} />
+								Save Draft
+							</button>
+							<button 
+								type="button"
+								onClick={() => setIsDraftManagerOpen(true)}
+								className="w-full px-4 py-3 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold focus:outline-none focus:shadow-outline duration-200 flex items-center justify-center gap-2"
+							>
+								<IconFileText size={16} />
+								Manage Drafts
+							</button>
+						</div>
+						{lastAutoSave && (
+							<div className="text-xs text-slate-400 mt-2 text-center">
+								Auto-saved at {lastAutoSave.toLocaleTimeString()}
+							</div>
+						)}
 					</div>
 					<div className='flex flex-col gap-4'>
 						<div className='flex flex-col gap-1'>
@@ -226,7 +337,7 @@ const BlogCreate = () => {
 						</div>
 						<div className='flex flex-col gap-1'>
 							<label className="block text-slate-400 text-sm font-bold" htmlFor="category">Category</label>
-							<Input type="text" id="category" name="category" className="w-full" placeholder="e.g. Tutorial, Random Posts" />
+							<Input type="text" id="category" name="category" className="w-full" value={blog.category || ''} onChange={insertionEdit} placeholder="e.g. Tutorial, Random Posts" />
 						</div>
 					</div>
 					<ThumbnailController setThumbnailFile={setThumbnailFile} blog={blog} setBlog={setBlog} />

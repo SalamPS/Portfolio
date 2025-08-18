@@ -4,6 +4,8 @@ import { IconBookmark, IconHeartPlus } from "@tabler/icons-react";
 import { AutoMD } from "@/components/utils/Markdown";
 import AdBanner from "./Adsense";
 import Link from "next/link";
+import { markdownToBlocks } from "@/components/blog/create/blockUtils";
+import BlockPreview from "@/components/blog/create/BlockPreview";
 
 const BlogContent = ({data, ads}: {data: blogStructure_, ads:blogAds_[]}) => {
 	return (
@@ -42,7 +44,22 @@ const BlogContent = ({data, ads}: {data: blogStructure_, ads:blogAds_[]}) => {
 					</div>
 
 					<div className="my-6 xl:my-8 flex flex-col gap-2">
-						<AutoMD content={data?.content || ''}/>
+						{/* Try to render as blocks first, fallback to AutoMD if it's old format */}
+						{data?.content ? (() => {
+							try {
+								const blocks = markdownToBlocks(data.content);
+								// If we have meaningful blocks, use the block renderer
+								if (blocks.length > 1 || (blocks.length === 1 && blocks[0].type !== 'paragraph') || (blocks.length === 1 && blocks[0].content.length > 50)) {
+									return <BlockPreview blocks={blocks} />;
+								}
+								// Otherwise use the traditional markdown renderer
+								return <AutoMD content={data.content} />;
+							} catch (error) {
+								// Fallback to AutoMD if parsing fails
+								console.warn('Failed to parse content as blocks, using AutoMD:', error);
+								return <AutoMD content={data.content} />;
+							}
+						})() : null}
 					</div>
 
 					<div className="mt-4">

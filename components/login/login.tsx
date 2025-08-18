@@ -30,7 +30,7 @@ export default function Login () {
 			password: formData.password
 		})
 		.then(() => {
-			router.push('/')
+			router.back()
 		})
 		.catch(error => {
 			const errorMessage = error instanceof AxiosError ? error?.response?.data.message : 'Gagal mendaftarkan client. Silahkan coba lagi nanti!';
