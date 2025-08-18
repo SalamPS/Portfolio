@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 'use client'
 
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { 
   IconGripVertical, 
   IconTrash, 
@@ -13,8 +13,10 @@ import {
   IconVideo,
   IconSeparator,
   IconUpload,
-  IconX
+  IconX,
+  IconLoader
 } from '@tabler/icons-react'
+import { progressiveCompress, isImageFile, formatFileSize } from '@/lib/imageUtils'
 
 export type BlockType = 
   | 'paragraph' 
@@ -39,6 +41,8 @@ export interface ContentBlock {
     url?: string // for videos
     items?: string[] // for lists
     author?: string // for quotes
+    originalSize?: number // for compressed images
+    compressedSize?: number // for compressed images
   }
 }
 
@@ -62,24 +66,70 @@ export const ContentBlockComponent = ({
   canMoveDown 
 }: ContentBlockProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const [isCompressing, setIsCompressing] = useState(false)
+  const [compressionInfo, setCompressionInfo] = useState<string>('')
 
   const handleContentChange = (content: string, metadata?: Partial<ContentBlock['metadata']>) => {
     onUpdate(block.id, { content, metadata: { ...block.metadata, ...metadata } })
   }
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0]
-      if (!file.type.startsWith('image/')) {
+      
+      if (!isImageFile(file)) {
         alert('Please select an image file')
         return
       }
+
+      const originalSizeKB = Math.round(file.size / 1024)
+      setCompressionInfo(`Original: ${formatFileSize(file.size)}`)
+      setIsCompressing(true)
       
-      const reader = new FileReader()
-      reader.readAsDataURL(file)
-      reader.onloadend = () => {
-        const dataUrl = reader.result as string
-        handleContentChange(dataUrl)
+      try {
+        // Compress image if larger than 500KB
+        const compressedFile = await progressiveCompress(file, {
+          maxSizeKB: 500, // Target max size: 500KB
+          maxWidth: 1920, // Max width: 1920px
+          maxHeight: 1080, // Max height: 1080px
+          quality: 0.8,   // Initial quality: 80%
+          format: 'jpeg'  // Output format: JPEG
+        })
+
+        const compressedSizeKB = Math.round(compressedFile.size / 1024)
+        const reductionPercent = Math.round((1 - compressedSizeKB/originalSizeKB) * 100)
+        
+        setCompressionInfo(
+          `${formatFileSize(file.size)} → ${formatFileSize(compressedFile.size)} (${reductionPercent}% reduction)`
+        )
+        
+        // Convert to data URL
+        const reader = new FileReader()
+        reader.readAsDataURL(compressedFile)
+        reader.onloadend = () => {
+          const dataUrl = reader.result as string
+          handleContentChange(dataUrl, { 
+            alt: file.name,
+            originalSize: file.size,
+            compressedSize: compressedFile.size
+          })
+          setIsCompressing(false)
+          
+          // Clear compression info after 5 seconds
+          setTimeout(() => setCompressionInfo(''), 5000)
+        }
+        
+        reader.onerror = () => {
+          alert('Failed to process image')
+          setIsCompressing(false)
+          setCompressionInfo('')
+        }
+        
+      } catch (error) {
+        console.error('Image compression failed:', error)
+        alert('Failed to compress image. Please try a different image.')
+        setIsCompressing(false)
+        setCompressionInfo('')
       }
     }
   }
@@ -142,17 +192,41 @@ export const ContentBlockComponent = ({
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
                   className="absolute top-2 right-2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70"
+                  disabled={isCompressing}
                 >
-                  <IconPhoto size={16} />
+                  {isCompressing ? (
+                    <IconLoader size={16} className="animate-spin" />
+                  ) : (
+                    <IconPhoto size={16} />
+                  )}
                 </button>
               </div>
             ) : (
               <div
-                onClick={() => fileInputRef.current?.click()}
-                className="w-full h-48 border-2 border-dashed border-slate-400/30 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-slate-400/50"
+                onClick={() => !isCompressing && fileInputRef.current?.click()}
+                className={`w-full h-48 border-2 border-dashed border-slate-400/30 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-slate-400/50 ${
+                  isCompressing ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
               >
-                <IconUpload size={32} className="mb-2 text-slate-400" />
-                <span className="text-slate-400">Click to upload image</span>
+                {isCompressing ? (
+                  <>
+                    <IconLoader size={32} className="mb-2 text-slate-400 animate-spin" />
+                    <span className="text-slate-400">Compressing image...</span>
+                  </>
+                ) : (
+                  <>
+                    <IconUpload size={32} className="mb-2 text-slate-400" />
+                    <span className="text-slate-400">Click to upload image</span>
+                    <span className="text-xs text-slate-500 mt-1">Images larger than 500KB will be automatically compressed</span>
+                  </>
+                )}
+              </div>
+            )}
+            
+            {/* Compression info */}
+            {compressionInfo && (
+              <div className="text-xs text-green-600 bg-green-50/10 p-2 rounded border border-green-200/20">
+                📦 {compressionInfo}
               </div>
             )}
             

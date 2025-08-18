@@ -12,6 +12,7 @@ import { markdownToBlocks } from './blockUtils'
 import BlockPreview from './BlockPreview'
 import DraftManager from './DraftManager'
 import { saveDraft, autoSaveDraft, getCurrentDraft, BlogDraft } from './draftUtils'
+import { progressiveCompress, isImageFile, formatFileSize } from '@/lib/imageUtils'
 
 const BlogCreate = () => {
 	const [preview, setPreview] = useState(false)	
@@ -361,28 +362,68 @@ const ThumbnailController = ({
   setThumbnailFile: React.Dispatch<React.SetStateAction<File | null>> // Tambah prop ini
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isCompressing, setIsCompressing] = useState(false)
+  const [compressionInfo, setCompressionInfo] = useState<string>('')
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
-      if (!file.type.startsWith('image/')) {
+      
+      if (!isImageFile(file)) {
         console.error('File yang diunggah bukan gambar.');
         return;
       }
-      
-      // Simpan file untuk upload
-      setThumbnailFile(file);
-      
-      // Buat preview
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onloadend = () => {
-        const dataUrl = reader.result as string;
-        setBlog((prev) => ({
-          ...prev,
-          thumbnail: dataUrl, // Hanya untuk preview
-        }));
-      };
+
+      const originalSizeKB = Math.round(file.size / 1024)
+      setCompressionInfo(`Processing: ${formatFileSize(file.size)}`)
+      setIsCompressing(true)
+
+      try {
+        // Compress thumbnail if larger than 200KB
+        const compressedFile = await progressiveCompress(file, {
+          maxSizeKB: 200,
+          maxWidth: 800,
+          maxHeight: 600,
+          quality: 0.8,
+          format: 'jpeg'
+        })
+
+        const compressedSizeKB = Math.round(compressedFile.size / 1024)
+        const reductionPercent = Math.round((1 - compressedSizeKB/originalSizeKB) * 100)
+        
+        setCompressionInfo(
+          `${formatFileSize(file.size)} → ${formatFileSize(compressedFile.size)} (${reductionPercent}% reduction)`
+        )
+        
+        // Simpan compressed file untuk upload
+        setThumbnailFile(compressedFile);
+        
+        // Buat preview
+        const reader = new FileReader();
+        reader.readAsDataURL(compressedFile);
+        reader.onloadend = () => {
+          const dataUrl = reader.result as string;
+          setBlog((prev) => ({
+            ...prev,
+            thumbnail: dataUrl, // Preview dari compressed file
+          }));
+          setIsCompressing(false)
+          
+          // Clear compression info after 5 seconds
+          setTimeout(() => setCompressionInfo(''), 5000)
+        };
+
+        reader.onerror = () => {
+          console.error('Failed to process thumbnail');
+          setIsCompressing(false)
+          setCompressionInfo('')
+        }
+        
+      } catch (error) {
+        console.error('Thumbnail compression failed:', error)
+        setIsCompressing(false)
+        setCompressionInfo('')
+      }
     }
   };
 
@@ -397,15 +438,41 @@ const ThumbnailController = ({
 				<input type="file" id="thumbnail" name="thumbnail" accept="image/*" ref={fileInputRef} 
 					className="hidden" onChange={handleFileSelect} />
 			</div>
-			<div onClick={triggerFileUpload} style={{
-				backgroundImage: blog?.thumbnail ? `url(${blog.thumbnail})` : 'none',
-			}} className='w-full h-48 hover:bg-opacity-15 bg-slate-600/20 hover:bg-slate-600/30 duration-200 gap-2 rounded-lg bg-cover bg-center flex items-stretch justify-stretch cursor-pointer'>
+			<div 
+				onClick={() => !isCompressing && triggerFileUpload()} 
+				style={{
+					backgroundImage: blog?.thumbnail ? `url(${blog.thumbnail})` : 'none',
+				}} 
+				className={`w-full h-48 hover:bg-opacity-15 bg-slate-600/20 hover:bg-slate-600/30 duration-200 gap-2 rounded-lg bg-cover bg-center flex items-stretch justify-stretch cursor-pointer ${
+					isCompressing ? 'opacity-50 cursor-not-allowed' : ''
+				}`}
+			>
 				<div className={`flex grow items-center justify-center gap-2 hover:opacity-100 rounded-lg bg-slate-700/80 duration-200 ${blog?.thumbnail ? 'opacity-0' : 'opacity-70'}`}>
-					<IconUpload size={16} />
-					<span>
-						{blog?.thumbnail ? 'Change Thumbnail' : 'Upload Thumbnail'}
-					</span>
+					{isCompressing ? (
+						<>
+							<IconUpload size={16} className="animate-pulse" />
+							<span>Compressing...</span>
+						</>
+					) : (
+						<>
+							<IconUpload size={16} />
+							<span>
+								{blog?.thumbnail ? 'Change Thumbnail' : 'Upload Thumbnail'}
+							</span>
+						</>
+					)}
 				</div>
+			</div>
+			
+			{/* Compression info */}
+			{compressionInfo && (
+				<div className="text-xs text-green-600 bg-green-50/10 p-2 rounded border border-green-200/20 mt-2">
+					📦 {compressionInfo}
+				</div>
+			)}
+			
+			<div className="text-xs text-slate-500 mt-1">
+				Images larger than 200KB will be automatically compressed
 			</div>
 		</div>
 	</>)
