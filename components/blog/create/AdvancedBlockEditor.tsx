@@ -82,6 +82,7 @@ export const BlockEditor = ({
   }, [autoSave, autoSaveInterval, hasUnsavedChanges])
 
   const updateBlock = (id: string, updates: Partial<ContentBlock>) => {
+    console.log('AdvancedBlockEditor updateBlock:', { id, updates })
     setBlocks(prevBlocks =>
       prevBlocks.map(block =>
         block.id === id ? { ...block, ...updates } : block

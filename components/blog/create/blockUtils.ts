@@ -1,4 +1,5 @@
 import { ContentBlock, BlockType } from './ContentBlock'
+import { getLanguageFromFilename } from '@/lib/languageUtils'
 
 export const blocksToMarkdown = (blocks: ContentBlock[]): string => {
   return blocks.map(block => {
@@ -20,8 +21,19 @@ export const blocksToMarkdown = (blocks: ContentBlock[]): string => {
         return imageMarkdown + '\n'
         
       case 'code':
-        const language = block.metadata?.language || ''
-        return `\`\`\`${language}\n${block.content}\n\`\`\`\n\n`
+        // Extract language from filename for markdown output
+        const filename = block.metadata?.filename || ''
+        const language = filename ? getLanguageFromFilename(filename) : 'text'
+        
+        // Use a custom format that won't be rendered by markdown
+        // We'll embed the filename in the language identifier using a special format
+        let languageIdentifier = language
+        if (filename && filename !== language) {
+          // Use format: language:filename (e.g., javascript:app.js)
+          languageIdentifier = `${language}:${filename}`
+        }
+        
+        return `\`\`\`${languageIdentifier}\n${block.content}\n\`\`\`\n\n`
         
       case 'quote':
         const lines = block.content.split('\n')
@@ -98,10 +110,10 @@ export const markdownToBlocks = (markdown: string): ContentBlock[] => {
     }
     
     // Code blocks
-    const codeBlockMatch = line.match(/^```(\w*)/)
+    const codeBlockMatch = line.match(/^```(.*)/)
     if (codeBlockMatch) {
       finishCurrentBlock()
-      const language = codeBlockMatch[1]
+      const languageInfo = codeBlockMatch[1]
       const codeLines: string[] = []
       i++ // Skip the opening ```
       
@@ -110,10 +122,21 @@ export const markdownToBlocks = (markdown: string): ContentBlock[] => {
         i++
       }
       
+      // Parse language info - could be "javascript:app.js" format
+      let filename = ''
+      
+      if (languageInfo.includes(':')) {
+        const parts = languageInfo.split(':')
+        filename = parts[1] // Use the filename part after colon
+      } else if (languageInfo) {
+        // If it's just a language name, use it as filename too
+        filename = languageInfo
+      }
+      
       currentBlock = {
         type: 'code',
         content: codeLines.join('\n'),
-        metadata: { language }
+        metadata: { filename }
       }
       continue
     }
@@ -128,7 +151,7 @@ export const markdownToBlocks = (markdown: string): ContentBlock[] => {
       // Check if next line is caption (italic text)
       let caption = ''
       if (i + 1 < lines.length && lines[i + 1].match(/^\*.*\*$/)) {
-        caption = lines[i + 1].replace(/^\*|\*$/g, '')
+        caption = lines[i + 1].slice(1, -1) // Remove asterisks
         i++ // Skip caption line
       }
       
@@ -136,6 +159,27 @@ export const markdownToBlocks = (markdown: string): ContentBlock[] => {
         type: 'image',
         content: src,
         metadata: { alt, caption }
+      }
+      continue
+    }
+    
+    // Videos (simple link format)
+    const videoMatch = line.match(/^\[Video\]\((.*?)\)/)
+    if (videoMatch) {
+      finishCurrentBlock()
+      const url = videoMatch[1]
+      
+      // Check if next line is caption (italic text)
+      let caption = ''
+      if (i + 1 < lines.length && lines[i + 1].match(/^\*.*\*$/)) {
+        caption = lines[i + 1].slice(1, -1) // Remove asterisks
+        i++ // Skip caption line
+      }
+      
+      currentBlock = {
+        type: 'video',
+        content: url,
+        metadata: { caption }
       }
       continue
     }
@@ -243,7 +287,7 @@ export const createEmptyBlock = (type: BlockType): ContentBlock => {
     case 'numbered-list':
       return { id, type, content: '', metadata: { items: [''] } }
     case 'code':
-      return { id, type, content: '', metadata: { language: '' } }
+      return { id, type, content: '', metadata: { filename: '' } }
     case 'image':
       return { id, type, content: '', metadata: { alt: '', caption: '' } }
     case 'video':

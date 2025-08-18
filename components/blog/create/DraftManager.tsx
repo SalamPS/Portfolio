@@ -83,6 +83,7 @@ export const DraftManager = ({ isOpen, onClose, onLoadDraft, currentBlog, isEdit
         <div className="flex items-center justify-between p-6 border-b border-slate-700">
           <h2 className="text-xl font-semibold text-white">Draft Manager</h2>
           <button
+            type="button"
             onClick={onClose}
             className="text-slate-400 hover:text-white"
           >
@@ -172,12 +173,14 @@ export const DraftManager = ({ isOpen, onClose, onLoadDraft, currentBlog, isEdit
                     
                     <div className="flex items-center space-x-2 ml-4">
                       <button
+                        type="button"
                         onClick={() => handleLoadDraft(draft)}
                         className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded text-sm transition-colors"
                       >
                         Load
                       </button>
                       <button
+                        type="button"
                         onClick={() => handleDeleteDraft(draft.id)}
                         className="text-red-400 hover:text-red-300 p-2 rounded hover:bg-red-500/10 transition-colors"
                       >

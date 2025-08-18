@@ -17,6 +17,7 @@ import {
   IconLoader
 } from '@tabler/icons-react'
 import { progressiveCompress, isImageFile, formatFileSize } from '@/lib/imageUtils'
+import { getLanguageFromFilename, getLanguageDisplayName } from '@/lib/languageUtils'
 
 export type BlockType = 
   | 'paragraph' 
@@ -35,7 +36,7 @@ export interface ContentBlock {
   content: string
   metadata?: {
     level?: number // for headings (1-6)
-    language?: string // for code blocks
+    filename?: string // for code blocks - filename from which language is derived
     alt?: string // for images
     caption?: string // for images/videos
     url?: string // for videos
@@ -70,6 +71,7 @@ export const ContentBlockComponent = ({
   const [compressionInfo, setCompressionInfo] = useState<string>('')
 
   const handleContentChange = (content: string, metadata?: Partial<ContentBlock['metadata']>) => {
+    console.log('ContentBlock handleContentChange:', { content, metadata, currentMetadata: block.metadata })
     onUpdate(block.id, { content, metadata: { ...block.metadata, ...metadata } })
   }
 
@@ -204,7 +206,7 @@ export const ContentBlockComponent = ({
             ) : (
               <div
                 onClick={() => !isCompressing && fileInputRef.current?.click()}
-                className={`w-full h-48 border-2 border-dashed border-slate-400/30 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-slate-400/50 ${
+                className={`w-full h-48 border-2 border-dashed border-slate-400/30 focus:ring-1 focus:outline-none rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-slate-400/50 ${
                   isCompressing ? 'opacity-50 cursor-not-allowed' : ''
                 }`}
               >
@@ -231,14 +233,14 @@ export const ContentBlockComponent = ({
             )}
             
             <input
-              className="w-full p-2 border rounded bg-transparent border-slate-400/30 text-sm"
+              className="w-full p-2 border rounded bg-transparent border-slate-400/30 text-sm focus:ring-1 focus:outline-none"
               placeholder="Image alt text (optional)"
               value={block.metadata?.alt || ''}
               onChange={(e) => handleContentChange(block.content, { alt: e.target.value })}
             />
             
             <input
-              className="w-full p-2 border rounded bg-transparent border-slate-400/30 text-sm"
+              className="w-full p-2 border rounded bg-transparent border-slate-400/30 text-sm focus:ring-1 focus:outline-none"
               placeholder="Image caption (optional)"
               value={block.metadata?.caption || ''}
               onChange={(e) => handleContentChange(block.content, { caption: e.target.value })}
@@ -247,18 +249,39 @@ export const ContentBlockComponent = ({
         )
 
       case 'code':
+        const handleFilenameChange = (filename: string) => {
+          // Just store the filename as-is, don't auto-update language
+          // Language will be derived for rendering purposes only
+          handleContentChange(block.content, { 
+            filename: filename // Explicitly set filename 
+          })
+        }
+
+        // For display purposes, show the detected language
+        const detectedLanguage = block.metadata?.filename 
+          ? getLanguageFromFilename(block.metadata.filename)
+          : 'text'
+
         return (
           <div className="space-y-2">
-            <input
-              className="w-full p-2 border rounded bg-slate-800 text-white border-slate-400/30"
-              placeholder="Programming language (e.g., javascript, python, typescript)"
-              value={block.metadata?.language || ''}
-              onChange={(e) => handleContentChange(block.content, { language: e.target.value })}
-            />
+            <div className="flex items-center space-x-2">
+              <input
+                className="flex-1 p-2 border rounded bg-slate-800 focus:ring-1 focus:outline-none text-white border-slate-400/30 text-sm"
+                placeholder="Filename (e.g., app.js, main.py, script.ts) or language name"
+                value={block.metadata?.filename || ''}
+                onChange={(e) => handleFilenameChange(e.target.value)}
+              />
+              {detectedLanguage && detectedLanguage !== 'text' && (
+                <span className="px-2 py-1 bg-slate-700 rounded text-xs text-slate-300">
+                  {getLanguageDisplayName(detectedLanguage)}
+                </span>
+              )}
+            </div>
             <textarea
-              className="w-full p-3 border rounded-lg resize-none bg-slate-900 text-green-400 font-mono border-slate-400/30 min-h-[150px]"
+              className="w-full p-3 border rounded-lg resize-none bg-slate-900 text-green-200/70 focus:ring-1 focus:outline-none font-mono border-slate-400/30 min-h-[150px]"
               placeholder="Enter your code here..."
               value={block.content}
+              spellCheck={false}
               onChange={(e) => handleContentChange(e.target.value)}
             />
           </div>
@@ -293,7 +316,7 @@ export const ContentBlockComponent = ({
                     {block.type === 'numbered-list' ? `${index + 1}.` : '•'}
                   </span>
                   <input
-                    className="flex-1 p-2 border rounded bg-transparent border-slate-400/30"
+                    className="flex-1 p-2 border rounded bg-transparent border-slate-400/30 focus:ring-1 focus:outline-none"
                     placeholder="List item..."
                     value={item}
                     onChange={(e) => {
@@ -335,13 +358,13 @@ export const ContentBlockComponent = ({
         return (
           <div className="space-y-2">
             <input
-              className="w-full p-3 border rounded-lg bg-transparent border-slate-400/30"
+              className="w-full p-3 border rounded-lg bg-transparent border-slate-400/30 focus:ring-1 focus:outline-none"
               placeholder="Video URL (YouTube, Vimeo, etc.)"
               value={block.content}
               onChange={(e) => handleContentChange(e.target.value)}
             />
             <input
-              className="w-full p-2 border rounded bg-transparent border-slate-400/30 text-sm"
+              className="w-full p-2 border rounded bg-transparent border-slate-400/30 text-sm focus:ring-1 focus:outline-none"
               placeholder="Video caption (optional)"
               value={block.metadata?.caption || ''}
               onChange={(e) => handleContentChange(block.content, { caption: e.target.value })}
@@ -377,9 +400,9 @@ export const ContentBlockComponent = ({
               H{block.metadata.level}
             </span>
           )}
-          {block.type === 'code' && block.metadata?.language && (
+          {block.type === 'code' && block.metadata?.filename && (
             <span className="text-xs bg-blue-600 text-white px-2 py-1 rounded">
-              {block.metadata.language}
+              {block.metadata.filename}
             </span>
           )}
         </div>

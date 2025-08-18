@@ -6,6 +6,7 @@ import AdBanner from "./Adsense";
 import Link from "next/link";
 import { markdownToBlocks } from "@/components/blog/create/blockUtils";
 import BlockPreview from "@/components/blog/create/BlockPreview";
+import { sans } from "@/app/fonts/fonts";
 
 const BlogContent = ({data, ads}: {data: blogStructure_, ads:blogAds_[]}) => {
 	return (
@@ -43,7 +44,7 @@ const BlogContent = ({data, ads}: {data: blogStructure_, ads:blogAds_[]}) => {
 						)}
 					</div>
 
-					<div className="my-6 xl:my-8 flex flex-col gap-2">
+					<div className={`my-6 xl:my-8 flex flex-col gap-2 ${sans.variable} font-[family-name:var(--font-sans)]`}>
 						{/* Try to render as blocks first, fallback to AutoMD if it's old format */}
 						{data?.content ? (() => {
 							try {

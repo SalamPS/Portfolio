@@ -3,6 +3,8 @@
 
 import { ContentBlock } from './ContentBlock'
 import { AutoMD } from '@/components/utils/Markdown'
+import { CodeBlock } from '@/components/utils/CodeBlock'
+import { getLanguageFromFilename } from '@/lib/languageUtils'
 
 interface BlockPreviewProps {
   blocks: ContentBlock[]
@@ -55,24 +57,25 @@ export const BlockPreview = ({ blocks }: BlockPreviewProps) => {
         )
 
       case 'code':
+        // Extract language from filename extension if available
+        const displayLanguage = block.metadata?.filename 
+          ? getLanguageFromFilename(block.metadata.filename)
+          : 'text'
+          
         return (
-          <div key={block.id} className="mb-4">
-            <pre className="bg-slate-800 text-green-400 p-4 rounded-lg overflow-x-auto">
-              <code className={block.metadata?.language ? `language-${block.metadata.language}` : ''}>
-                {block.content}
-              </code>
-            </pre>
-            {block.metadata?.language && (
-              <div className="text-xs text-slate-500 mt-1">
-                Language: {block.metadata.language}
-              </div>
-            )}
+          <div key={block.id} className="mb-6">
+            <CodeBlock 
+              code={block.content}
+              language={displayLanguage}
+              filename={block.metadata?.filename}
+              showLineNumbers={true}
+            />
           </div>
         )
 
       case 'quote':
         return (
-          <blockquote key={block.id} className="border-l-4 border-blue-500 bg-blue-50/5 pl-4 py-2 mb-4 italic">
+          <blockquote key={block.id} className="border-l-4 border-blue-500 bg-blue-50/5 pl-4 pr-2 py-2 mb-4 italic">
             <div className="whitespace-pre-line">
               {block.content}
             </div>

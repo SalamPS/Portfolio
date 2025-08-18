@@ -1,12 +1,6 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local";
 import "./globals.css";
-
-const tektur = localFont({
-  src: "./fonts/tektur.ttf",
-  variable: "--font-tektur",
-  weight: "400",
-});
+import { tektur } from "./fonts/fonts";
 
 export const metadata: Metadata = {
   title: {

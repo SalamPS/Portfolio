@@ -281,7 +281,9 @@ const BlogEdit = ({ initialBlog }: BlogEditProps) => {
 					<div>
 						<span className="block text-slate-400 text-end text-sm font-bold mb-2">Blog Utilities</span>
 						<div className="space-y-2">
-							<button className={`w-full px-4 py-3 rounded-xl text-white font-bold focus:outline-none focus:shadow-outline duration-200 ${preview ? 'bg-emerald-700 hover:bg-emerald-600' : 'bg-slate-500/20 hover:bg-slate-500/30'}`}
+							<button 
+								type="button"
+								className={`w-full px-4 py-3 rounded-xl text-white font-bold focus:outline-none focus:shadow-outline duration-200 ${preview ? 'bg-emerald-700 hover:bg-emerald-600' : 'bg-slate-500/20 hover:bg-slate-500/30'}`}
 								onClick={(e) => {e.preventDefault(); setPreview(!preview);}}>
 								Toggle Preview
 							</button>

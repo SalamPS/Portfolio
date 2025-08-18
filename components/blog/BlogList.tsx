@@ -319,6 +319,7 @@ const BlogList = () => {
 														<IconPencil size={16} />
 													</Link>
 													<button
+														type="button"
 														onClick={(e) => {
 															e.preventDefault();
 															handleDeleteClick(post);
@@ -377,6 +378,7 @@ const BlogList = () => {
 					</p>
 					<div className="flex gap-3 justify-end">
 						<button
+							type="button"
 							onClick={handleDeleteCancel}
 							disabled={isDeleting}
 							className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors disabled:opacity-50"
@@ -384,6 +386,7 @@ const BlogList = () => {
 							Cancel
 						</button>
 						<button
+							type="button"
 							onClick={handleDeleteConfirm}
 							disabled={isDeleting}
 							className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors disabled:opacity-50 flex items-center gap-2"
