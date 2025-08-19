@@ -193,9 +193,7 @@ const BlogEdit = ({ initialBlog }: BlogEditProps) => {
         if (response.data.success) {
           showNotification('success', 'Success', 'Blog updated successfully!');
           // Redirect ke blog setelah berhasil update
-          setTimeout(() => {
-            router.push(`/blog/${initialBlog.slug}`);
-          }, 2000);
+					router.push(`/blog/${response.data.slug}`);
         } else {
           showNotification('error', 'Update Failed', response.data.message || 'Failed to update blog');
         }

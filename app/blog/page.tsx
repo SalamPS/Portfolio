@@ -3,6 +3,10 @@ import Jumbotron from "@/components/global/Jumbotron"
 import GlobalNavbar from "@/components/global/Navbar"
 import LampQueryProvider from "@/components/global/QueryProvider"
 
+export const metadata = {
+  title: "Blog"
+}
+
 const BlogListPage = () => {
 	return (<>
 		<GlobalNavbar space/>

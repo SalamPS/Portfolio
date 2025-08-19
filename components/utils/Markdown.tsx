@@ -20,7 +20,7 @@ export const AutoMD = ({content, inline = false, className = ""}: AutoMDProps) =
 				remarkPlugins={[remarkGfm]}
 				components={{
 					// For inline usage, prevent block elements
-					p: inline ? ({children}) => <span>{children}</span> : undefined,
+					p: inline ? ({children}) => <span>{children}</span> : ({children}) => <p>{children}</p>,
 					code: ({className, children, ...props}) => {
 						const match = /language-(\w+)/.exec(className || '')
 						const language = match ? match[1] : 'text'
@@ -62,16 +62,16 @@ export const AutoMD = ({content, inline = false, className = ""}: AutoMDProps) =
 						return <div className="not-prose my-4">{children}</div>
 					},
 					// For inline usage, prevent other block elements
-					blockquote: inline ? ({children}) => <span>{children}</span> : undefined,
-					h1: inline ? ({children}) => <span className="font-bold">{children}</span> : undefined,
-					h2: inline ? ({children}) => <span className="font-bold">{children}</span> : undefined,
-					h3: inline ? ({children}) => <span className="font-bold">{children}</span> : undefined,
-					h4: inline ? ({children}) => <span className="font-bold">{children}</span> : undefined,
-					h5: inline ? ({children}) => <span className="font-bold">{children}</span> : undefined,
-					h6: inline ? ({children}) => <span className="font-bold">{children}</span> : undefined,
-					ul: inline ? ({children}) => <span>{children}</span> : undefined,
-					ol: inline ? ({children}) => <span>{children}</span> : undefined,
-					li: inline ? ({children}) => <span>{children}</span> : undefined,
+					blockquote: inline ? ({children}) => <span className="italic">{children}</span> : ({children}) => <blockquote className="border-l-4 border-slate-400 pl-4 italic my-4">{children}</blockquote>,
+					h1: inline ? ({children}) => <span className="font-bold">{children}</span> : ({children}) => <h1 className="text-3xl font-bold my-4">{children}</h1>,
+					h2: inline ? ({children}) => <span className="font-bold">{children}</span> : ({children}) => <h2 className="text-2xl font-bold my-3">{children}</h2>,
+					h3: inline ? ({children}) => <span className="font-bold">{children}</span> : ({children}) => <h3 className="text-xl font-bold my-3">{children}</h3>,
+					h4: inline ? ({children}) => <span className="font-bold">{children}</span> : ({children}) => <h4 className="text-lg font-bold my-2">{children}</h4>,
+					h5: inline ? ({children}) => <span className="font-bold">{children}</span> : ({children}) => <h5 className="text-base font-bold my-2">{children}</h5>,
+					h6: inline ? ({children}) => <span className="font-bold">{children}</span> : ({children}) => <h6 className="text-sm font-bold my-2">{children}</h6>,
+					ul: inline ? ({children}) => <span>{children}</span> : ({children}) => <ul className="list-disc list-inside my-4 space-y-1">{children}</ul>,
+					ol: inline ? ({children}) => <span>{children}</span> : ({children}) => <ol className="list-decimal list-inside my-4 space-y-1">{children}</ol>,
+					li: inline ? ({children}) => <span>{children}</span> : ({children}) => <li>{children}</li>,
 				}}
 			>
 				{content || ''}
