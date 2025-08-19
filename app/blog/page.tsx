@@ -4,7 +4,8 @@ import GlobalNavbar from "@/components/global/Navbar"
 import LampQueryProvider from "@/components/global/QueryProvider"
 
 export const metadata = {
-  title: "Blog"
+  title: "Blog",
+  description: "Explore the latest articles, insights, and stories from Salam's journey!"
 }
 
 const BlogListPage = () => {

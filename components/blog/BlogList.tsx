@@ -1,14 +1,15 @@
 'use client'
 /* eslint-disable @next/next/no-img-element */
+import React, { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { blogStructure_ } from "../interface/blogStructure";
 import client from "@/lib/auth";
-import { useState, useMemo, useEffect } from "react";
 import ReactPaginate from "react-paginate";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Skeleton } from "../global/Skeleton";
 import { IconPencil, IconTrash } from '@tabler/icons-react';
 import { Modal } from "../global/Modal";
+// import AdBanner from "../blog/content/Adsense";
 
 const BlogList = () => {
   const [currentPage, setCurrentPage] = useState(0);
@@ -169,8 +170,21 @@ const BlogList = () => {
 
   return (<>
 		<div className="px-8 xl:px-28 py-12 md:py-24 xl:py-32 grid grid-cols-1 xl:grid-cols-6 gap-4 xl:gap-8">
-			<div className="xl:col-span-2 flex flex-col gap-4">
+			<div className="xl:col-span-2 grid md:grid-cols-2 xl:flex xl:flex-col gap-4">
+
 				<section id="filter" className="border border-slate-600 rounded-lg">
+					{
+						isAdmin && (
+							<div id="admin-menu flex" className="flex justify-stretch">
+								<Link
+									href="/blog/create"
+									className="bg-[#0f6252] text-white px-4 py-2 text-center w-full rounded-t-md hover:bg-[#0f6252]/80 transition"
+								>
+									Create New Post
+								</Link>
+							</div>
+						)
+					}
 					<div className="flex flex-col gap-4 p-6">
 						{/* Search Input */}
 						<div className="space-y-2">
@@ -242,25 +256,28 @@ const BlogList = () => {
 					</div>
 				</section>
 
-				{
-					isAdmin && (
-						<div id="admin-menu flex" className="flex justify-stretch">
-							<Link
-								href="/blog/create"
-								className="bg-[#0f6252] text-white px-4 py-2 text-center w-full rounded-md hover:bg-[#0f6252]/80 transition"
-							>
-								Create New Post
-							</Link>
-						</div>
-					)
-				}
-
-				<div className="w-full aspect-square border flex items-center justify-center border-slate-600 bg-slate-800/40 rounded shadow text-slate-400">
-					No ads available
+				<div className="w-full xl:aspect-[4/3] border flex items-center justify-center border-slate-600 bg-slate-800/40 rounded shadow text-slate-400">
+					<div className="text-xs text-gray-400 mb-2 text-center">Advertisement</div>
+					{/* Sidebar Ad - Rectangle */}
+					{/* <AdBanner
+						dataAdSlot="8897271609"
+						dataAdFormat="rectangle"
+						dataFullWidthResponsive={false}
+					/> */}
 				</div>
 			</div>
 
 			<div className="xl:col-span-4">
+				{/* Top Banner Ad - Above Blog List */}
+				<div className="w-full mb-8 p-4 bg-slate-800/20 rounded-lg border border-slate-600">
+					<div className="text-xs text-gray-400 text-center">Advertisement</div>
+					{/* <AdBanner
+						dataAdSlot="8897271609"
+						dataAdFormat="horizontal"
+						dataFullWidthResponsive={true}
+					/> */}
+				</div>
+
 				<div className="flex flex-col xl:flex-row gap-4 xl:gap-8 min-h-screen">
 					<main className="w-full">
 
@@ -286,55 +303,60 @@ const BlogList = () => {
 						{!isLoading && !isError && (
 							<div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-6">
 								{blogPosts.length > 0 ? (
-									blogPosts.map((post: blogStructure_) => (
-										<div key={post._id} className="relative">
-											<Link className="block shadow-lg hover:shadow-xl hover:scale-[1.01] duration-200 rounded-lg overflow-hidden border border-slate-600"
-												href={`/blog/${post.slug}`}>
-												<div className="w-full aspect-video bg-cover bg-center">
-													<img 
-														src={post.thumbnail || '/placeholder-image.jpg'} 
-														alt={post.title}
-														className="w-full h-full object-cover"
-													/>
-												</div>
-												<div className="p-4">
-													<h2 className="text-xl font-semibold truncate">{post.title}</h2>
-													<p className="text-sm text-gray-500 mt-1">By {post.authorName}</p>
-													<div className="flex gap-2 mt-2">
-														{post.tags && post.tags.slice(0, 3).map((tag: string, i: number) => (
-															<span key={i} className="px-3 py-1 bg-[#0f6252] text-xs rounded-full">{tag}</span>
-														))}
-													</div>
-												</div>
-											</Link>
-											
-											{/* Edit Button for Admin */}
-											{isAdmin && (
-												<div className="absolute top-2 right-2 flex gap-2">
-													<Link 
-														href={`/blog/edit/${post.slug}`}
-														className="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-full shadow-lg transition-colors z-10"
-														title="Edit Blog Post"
-													>
-														<IconPencil size={16} />
+									<>
+										{blogPosts.map((post: blogStructure_) => (
+											<React.Fragment key={post._id}>
+												{/* Show ad every 4 posts */}
+												<div className="relative">
+													<Link className="block shadow-lg hover:shadow-xl hover:scale-[1.01] duration-200 rounded-lg overflow-hidden border border-slate-600"
+														href={`/blog/${post.slug}`}>
+														<div className="w-full aspect-video bg-cover bg-center">
+															<img 
+																src={post.thumbnail || '/placeholder-image.jpg'} 
+																alt={post.title}
+																className="w-full h-full object-cover"
+															/>
+														</div>
+														<div className="p-4">
+															<h2 className="text-xl font-semibold truncate">{post.title}</h2>
+															<p className="text-sm text-gray-500 mt-1">By {post.authorName}</p>
+															<div className="flex gap-2 mt-2">
+																{post.tags && post.tags.slice(0, 3).map((tag: string, i: number) => (
+																	<span key={i} className="px-3 py-1 bg-[#0f6252] text-xs rounded-full">{tag}</span>
+																))}
+															</div>
+														</div>
 													</Link>
-													<button
-														type="button"
-														onClick={(e) => {
-															e.preventDefault();
-															handleDeleteClick(post);
-														}}
-														className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-full shadow-lg transition-colors z-10"
-														title="Delete Blog Post"
-													>
-														<IconTrash size={16} />
-													</button>
+													
+													{/* Edit Button for Admin */}
+													{isAdmin && (
+														<div className="absolute top-2 right-2 flex gap-2">
+															<Link 
+																href={`/blog/edit/${post.slug}`}
+																className="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-full shadow-lg transition-colors z-10"
+																title="Edit Blog Post"
+															>
+																<IconPencil size={16} />
+															</Link>
+															<button
+																type="button"
+																onClick={(e) => {
+																	e.preventDefault();
+																	handleDeleteClick(post);
+																}}
+																className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-full shadow-lg transition-colors z-10"
+																title="Delete Blog Post"
+															>
+																<IconTrash size={16} />
+															</button>
+														</div>
+													)}
 												</div>
-											)}
-										</div>
-									))
+											</React.Fragment>
+										))}
+									</>
 								) : (
-									<div className="col-span-3 text-center py-10 text-gray-500">
+									<div className="col-span-1 md:col-span-2 xl:col-span-2 text-center py-10 text-gray-500">
 										No blog posts found.
 									</div>
 								)}
@@ -359,6 +381,16 @@ const BlogList = () => {
 								/>
 							</div>
 						)}
+
+						{/* Bottom Banner Ad */}
+						<div className="mt-12 w-full p-4 bg-slate-800/20 rounded-lg border border-slate-600">
+							<div className="text-xs text-gray-400 text-center">Advertisement</div>
+							{/* <AdBanner
+								dataAdSlot="8897271609"
+								dataAdFormat="horizontal" 
+								dataFullWidthResponsive={true}
+							/> */}
+						</div>
 					</main>
 				</div>
 			</div>

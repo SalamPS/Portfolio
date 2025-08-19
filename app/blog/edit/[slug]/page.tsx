@@ -5,7 +5,8 @@ import { Metadata } from 'next'
 import client from '@/lib/auth'
 
 export const metadata: Metadata = {
-	title: "Edit Blog"
+	title: "Edit Blog",
+	description: "Edit Salam's blog post. But, are you belong to this journey?"
 }
 
 // Simulasi fungsi untuk mendapatkan blog berdasarkan slug

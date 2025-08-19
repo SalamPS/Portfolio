@@ -86,8 +86,14 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const { content } = await params;
   const data = await getBlogData(content);
   
+  // Base URL untuk production atau development
+  const baseUrl = process.env.NODE_ENV === 'production' 
+    ? 'https://salamp.id' 
+    : 'http://localhost:3000';
+  
   if (!data) {
     return {
+      metadataBase: new URL(baseUrl),
       title: {
         absolute: 'LampBlog | Not Found'
       },
@@ -96,6 +102,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   }
 
   return {
+    metadataBase: new URL(baseUrl),
     title: {
       absolute: `LampBlog | ${data.blog.title}`
     },
@@ -115,6 +122,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     twitter: {
       card: 'summary_large_image',
       title: `LampBlog | ${data.blog.title}`,
+		  creator: '@salamp_',
       description: data.blog.content.substring(0, 160).replace(/<[^>]*>/g, ''),
       images: data.blog.thumbnail ? [data.blog.thumbnail] : [],
     }

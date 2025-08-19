@@ -1,0 +1,21 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+
+# Disallow admin and API routes
+Disallow: /api/
+Disallow: /login-admin
+Disallow: /unauthorized
+Disallow: /_next/
+Disallow: /admin
+
+# Allow important files
+Allow: /api/og/*
+Allow: /_next/static/
+Allow: /_next/image/
+
+# Sitemap
+Sitemap: https://salamp.id/sitemap.xml
+
+# Crawl delay
+Crawl-delay: 1

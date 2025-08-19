@@ -146,8 +146,8 @@ export const CodeBlock = ({
           type="button"
           onClick={handleCopy}
           className="flex items-center space-x-2 px-3 py-1.5 text-xs bg-slate-700/70 hover:bg-slate-600 
-                   text-slate-300 hover:text-white rounded-md transition-all duration-200 
-                   opacity-0 group-hover:opacity-100 focus:opacity-100"
+                   text-slate-300 hover:text-white rounded-md transition-all duration-200 opacity-100 
+                   xl:opacity-0 group-hover:opacity-100 focus:opacity-100"
           aria-label={copied ? 'Copied!' : 'Copy code'}
         >
           {copied ? (
