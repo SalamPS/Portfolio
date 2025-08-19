@@ -6,7 +6,7 @@ import Link from "next/link";
 import { markdownToBlocks } from "@/components/blog/create/blockUtils";
 import BlockPreview from "@/components/blog/create/BlockPreview";
 import { sans } from "@/app/fonts/fonts";
-// import AdBanner from "./Adsense";
+import AdBanner from "./Adsense";
 
 const BlogContent = ({data, ads}: {data: blogStructure_, ads:blogAds_[]}) => {
 	return (
@@ -81,11 +81,11 @@ const BlogContent = ({data, ads}: {data: blogStructure_, ads:blogAds_[]}) => {
 				<section id="ads" className="xl:col-span-3 w-full order-last xl:w-96 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-1 gap-4 h-fit">
 					<div className="w-full flex items-center justify-center aspect-square border border-slate-600 bg-slate-800/40 rounded shadow text-slate-400">
 						<div className="text-xs text-gray-400 mb-2 text-center">Advertisement</div>
-						{/* <AdBanner
+						<AdBanner
 							dataAdSlot="8897271609"
 							dataAdFormat="auto"
 							dataFullWidthResponsive={true}
-						/> */}
+						/>
 					</div>
 					{ads && (
 						ads.map((ad, index) => (

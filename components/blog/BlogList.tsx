@@ -9,7 +9,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Skeleton } from "../global/Skeleton";
 import { IconPencil, IconTrash } from '@tabler/icons-react';
 import { Modal } from "../global/Modal";
-// import AdBanner from "../blog/content/Adsense";
+import AdBanner from "../blog/content/Adsense";
 
 const BlogList = () => {
   const [currentPage, setCurrentPage] = useState(0);
@@ -256,26 +256,26 @@ const BlogList = () => {
 					</div>
 				</section>
 
-				<div className="w-full xl:aspect-[4/3] border flex items-center justify-center border-slate-600 bg-slate-800/40 rounded shadow text-slate-400">
+				<div className="w-full xl:aspect-[4/3] border hidden md:flex items-center justify-center border-slate-600 bg-slate-800/40 rounded shadow text-slate-400">
 					<div className="text-xs text-gray-400 mb-2 text-center">Advertisement</div>
 					{/* Sidebar Ad - Rectangle */}
-					{/* <AdBanner
+					<AdBanner
 						dataAdSlot="8897271609"
 						dataAdFormat="rectangle"
 						dataFullWidthResponsive={false}
-					/> */}
+					/>
 				</div>
 			</div>
 
 			<div className="xl:col-span-4">
 				{/* Top Banner Ad - Above Blog List */}
-				<div className="w-full mb-8 p-4 bg-slate-800/20 rounded-lg border border-slate-600">
+				<div className="w-full mb-6 p-4 bg-slate-800/20 rounded-lg border border-slate-600">
 					<div className="text-xs text-gray-400 text-center">Advertisement</div>
-					{/* <AdBanner
+					<AdBanner
 						dataAdSlot="8897271609"
 						dataAdFormat="horizontal"
 						dataFullWidthResponsive={true}
-					/> */}
+					/>
 				</div>
 
 				<div className="flex flex-col xl:flex-row gap-4 xl:gap-8 min-h-screen">
@@ -383,13 +383,13 @@ const BlogList = () => {
 						)}
 
 						{/* Bottom Banner Ad */}
-						<div className="mt-12 w-full p-4 bg-slate-800/20 rounded-lg border border-slate-600">
+						<div className="mt-6 w-full p-4 bg-slate-800/20 rounded-lg border border-slate-600">
 							<div className="text-xs text-gray-400 text-center">Advertisement</div>
-							{/* <AdBanner
+							<AdBanner
 								dataAdSlot="8897271609"
 								dataAdFormat="horizontal" 
 								dataFullWidthResponsive={true}
-							/> */}
+							/>
 						</div>
 					</main>
 				</div>
