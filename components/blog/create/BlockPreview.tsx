@@ -34,7 +34,7 @@ export const BlockPreview = ({ blocks }: BlockPreviewProps) => {
         
         return (
           <HeadingTag key={block.id} className={headingClasses[level as keyof typeof headingClasses] || headingClasses[1]}>
-            {block.content}
+            <AutoMD content={block.content} inline={true} />
           </HeadingTag>
         )
 
@@ -77,7 +77,7 @@ export const BlockPreview = ({ blocks }: BlockPreviewProps) => {
         return (
           <blockquote key={block.id} className="border-l-4 border-blue-500 bg-blue-50/5 pl-4 pr-2 py-2 mb-4 italic">
             <div className="whitespace-pre-line">
-              {block.content}
+              <AutoMD content={block.content} inline={true} />
             </div>
             {block.metadata?.author && (
               <footer className="text-sm text-slate-400 mt-2 not-italic">
@@ -96,7 +96,7 @@ export const BlockPreview = ({ blocks }: BlockPreviewProps) => {
               .filter(item => item.trim() !== '')
               .map((item, index) => (
                 <li key={index} className="text-slate-200">
-                  {item}
+                  <AutoMD content={item} inline={true} />
                 </li>
               ))}
           </ul>
@@ -111,7 +111,7 @@ export const BlockPreview = ({ blocks }: BlockPreviewProps) => {
               .filter(item => item.trim() !== '')
               .map((item, index) => (
                 <li key={index} className="text-slate-200">
-                  {item}
+                  <AutoMD content={item} inline={true} />
                 </li>
               ))}
           </ol>

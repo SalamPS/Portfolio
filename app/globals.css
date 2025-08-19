@@ -75,6 +75,30 @@ a {
 .markdown-content blockquote { @apply border-l-4 border-blue-500 bg-blue-50/5 pl-4 pr-2 py-2 mb-4 italic; }
 .markdown-content code { @apply bg-slate-200/20 mx-0.5 px-1.5 pb-0.5 pt-1 rounded text-sm font-mono; }
 .markdown-content a { @apply text-blue-400 hover:text-blue-800 underline; }
+
+/* Inline markdown styling - for use inside headings, lists, etc. */
+.inline-markdown {
+  @apply inline;
+}
+.inline-markdown strong {
+  @apply font-bold;
+}
+.inline-markdown em {
+  @apply italic;
+}
+.inline-markdown code {
+  @apply bg-slate-800 px-2 py-1 rounded text-sm font-mono text-slate-200 mx-1;
+}
+.inline-markdown a {
+  @apply text-blue-400 hover:text-blue-300 underline;
+}
+/* Ensure no block elements in inline mode */
+.inline-markdown p {
+  @apply inline;
+}
+.inline-markdown > * {
+  @apply inline;
+}
 pre {
   padding-left: 2px !important;
 }
